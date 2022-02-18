@@ -1,0 +1,6 @@
+# Root CA secrets
+root-CA*
+
+# No keys or certificates
+*.crt
+*.key
