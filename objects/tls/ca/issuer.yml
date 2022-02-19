@@ -1,0 +1,9 @@
+#### Issuer for other namespaces
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: root-ca-issuer
+spec:
+  ca:
+    # https://cert-manager.io/docs/configuration/ca/
+    secretName: root-ca
