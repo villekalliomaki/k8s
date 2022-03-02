@@ -1,6 +1,6 @@
-#### Issuer for other namespaces
+#### Issuer for whole cluster
 apiVersion: cert-manager.io/v1
-kind: Issuer
+kind: ClusterIssuer
 metadata:
   name: root-ca-issuer
 spec:
