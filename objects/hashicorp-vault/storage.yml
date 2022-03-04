@@ -1,0 +1,82 @@
+#### Local storage for Hashicorp Vault
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-hashicorp-vault
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+# Allow to expand later
+allowVolumeExpansion: true
+---
+#### Cypress
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hashicorp-vault-cypress
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  # Don't delete data if PVC is deleted
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-hashicorp-vault
+  local:
+    path: /mnt/hashicorp-vault
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - cypress
+---
+#### Degray
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hashicorp-vault-degray
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-hashicorp-vault
+  local:
+    path: /mnt/hashicorp-vault
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - degray
+---
+#### Ozarks
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hashicorp-vault-ozarks
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-hashicorp-vault
+  local:
+    path: /mnt/hashicorp-vault
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - ozarks

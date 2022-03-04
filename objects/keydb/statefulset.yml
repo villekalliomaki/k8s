@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: keydb
+spec:
+  replicas: 3
+  updateStrategy:
+    type: OnDelete
+  serviceName: keydb
+  selector:
+    matchLabels:
+      app: keydb
+  template:
+    metadata:
+      labels:
+        app: keydb
+      annotations:
+        # Injecting Vault secrets
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "keydb"
+        vault.hashicorp.com/agent-inject-secret-auth-arguments: "keydb/config"
+        vault.hashicorp.com/agent-inject-template-auth-arguments: |
+          {{- with secret "keydb/config" -}}
+          --requirepass {{ .Data.data.password }}
+          --masterauth {{ .Data.data.password }}
+          {{- end -}}
+        # Trust Vault server
+        # vault.hashicorp.com/tls-secret: "hashicorp-vault-tls"
+        # vault.hashicorp.com/ca-cert: "/vault/tls/tls.crt"
+        # vault.hashicorp.com/ca-key: "/vault/tls/tls.key"
+        vault.hashicorp.com/tls-skip-verify: "true"
+        # Temporary fix ^^^^^^
+    spec:
+      serviceAccountName: keydb
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: keydb
+          image: eqalpha/keydb:latest
+          ports:
+            - containerPort: 6379
+              name: redis
+            - containerPort: 6380
+              name: redis-tls
+          volumeMounts:
+            # Database dump location
+            - name: data
+              mountPath: /data
+            # Mount TLS certs + keys
+            - mountPath: /keydb-tls
+              name: keydb-tls
+              readOnly: true
+            # Server config file
+            - name: config
+              mountPath: /etc/keydb/keydb.conf
+              subPath: keydb.conf
+          resources:
+            limits:
+              memory: 1Gi
+          # Configure multi-master, and check
+          # hostname so node is not adding itself
+          command:
+            - "/bin/bash"
+            - "-c"
+            - |
+              keydb-server \
+              /etc/keydb/keydb.conf \
+              $([[ $HOSTNAME != keydb-0 ]] && echo "--replicaof keydb-0.keydb 6380") \
+              $([[ $HOSTNAME != keydb-1 ]] && echo "--replicaof keydb-1.keydb 6380") \
+              $([[ $HOSTNAME != keydb-2 ]] && echo "--replicaof keydb-2.keydb 6380") \
+              $(cat /vault/secrets/auth-arguments)
+      volumes:
+        - name: keydb-tls
+          secret:
+            secretName: keydb-tls
+        - name: config
+          configMap:
+            name: keydb-config
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-keydb
+        resources:
+          requests:
+            storage: 3Gi

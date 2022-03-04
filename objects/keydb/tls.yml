@@ -1,0 +1,20 @@
+# Vault API
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: keydb-tls
+spec:
+  secretName: keydb-tls
+  duration: 720h # 30 days
+  renewBefore: 72h # 3 days
+  dnsNames:
+    - keydb
+    - keydb-0.keydb
+    - keydb-1.keydb
+    - keydb-2.keydb
+  commonName: keydb
+  issuerRef:
+    # The cluster root CA
+    name: root-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io

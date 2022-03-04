@@ -1,0 +1,29 @@
+# Vault API
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: hashicorp-vault-tls
+spec:
+  secretName: hashicorp-vault-tls
+  duration: 720h # 30 days
+  renewBefore: 72h # 3 days
+  # For pod-internal vault CLI
+  ipAddresses:
+    - 127.0.0.1
+  # Capture all possible hostnames
+  dnsNames:
+    - hashicorp-vault-0
+    - hashicorp-vault-1
+    - hashicorp-vault-2
+    - hashicorp-vault-0.hashicorp-vault-internal
+    - hashicorp-vault-1.hashicorp-vault-internal
+    - hashicorp-vault-2.hashicorp-vault-internal
+    - hashicorp-vault-internal
+    - hashicorp-vault-active
+    - hashicorp-vault-standby
+  commonName: "*.hashicorp-vault-internal"
+  issuerRef:
+    # The cluster root CA
+    name: root-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
