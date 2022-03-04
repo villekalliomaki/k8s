@@ -1,9 +1,9 @@
-#### Root CA cert + key template
+## Root CA cert + key template
 apiVersion: v1
 kind: Secret
 metadata:
   name: root-ca
   namespace: cert-manager
 data:
-  tls.crt: certificate
-  tls.key: key
+  tls.crt: certificate here
+  tls.key: key here
