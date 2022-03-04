@@ -1,4 +1,4 @@
-#### Local storage for Hashicorp Vault
+## Local storage for Hashicorp Vault
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -8,7 +8,7 @@ volumeBindingMode: WaitForFirstConsumer
 # Allow to expand later
 allowVolumeExpansion: true
 ---
-#### Cypress
+## Cypress
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -33,7 +33,7 @@ spec:
               values:
                 - cypress
 ---
-#### Degray
+## Degray
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -57,7 +57,7 @@ spec:
               values:
                 - degray
 ---
-#### Ozarks
+## Ozarks
 apiVersion: v1
 kind: PersistentVolume
 metadata:
