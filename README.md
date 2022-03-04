@@ -1,5 +1,9 @@
 # Kubernetes cluster
 
+### Components
+- Hashicorp Vault
+- KeyDB
+
 ### `/objects`
 
 Kubernetes objects.
