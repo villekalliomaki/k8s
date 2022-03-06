@@ -1,0 +1,84 @@
+## Local storage for the Stolon cluster.
+## When more replicas/nodes are added directory /mnt/stolon
+## needs to be created on the new node.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-stolon
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+# Allow to expand later
+allowVolumeExpansion: true
+---
+## Cypress
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: stolon-cypress
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  # Don't delete data if PVC is deleted
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-stolon
+  local:
+    path: /mnt/stolon
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - cypress
+---
+## Degray
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: stolon-degray
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-stolon
+  local:
+    path: /mnt/stolon
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - degray
+---
+## Ozarks
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: stolon-ozarks
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-stolon
+  local:
+    path: /mnt/stolon
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - ozarks

@@ -5,7 +5,7 @@ metadata:
 spec:
   replicas: 3
   updateStrategy:
-    type: OnDelete
+    type: RollingUpdate
   serviceName: keydb
   selector:
     matchLabels:
@@ -26,10 +26,11 @@ spec:
           {{- end -}}
         # Trust Vault server
         # vault.hashicorp.com/tls-secret: "hashicorp-vault-tls"
-        # vault.hashicorp.com/ca-cert: "/vault/tls/tls.crt"
+        # vault.hashicorp.com/ca-cert: "/vault/tls/ca.crt"
+        # vault.hashicorp.com/client-cert: "/vault/tls/tls.crt"
+        # vault.hashicorp.com/client-key: "/vault/tls/tls.key"
         # vault.hashicorp.com/ca-key: "/vault/tls/tls.key"
         vault.hashicorp.com/tls-skip-verify: "true"
-        # Temporary fix ^^^^^^
     spec:
       serviceAccountName: keydb
       terminationGracePeriodSeconds: 10

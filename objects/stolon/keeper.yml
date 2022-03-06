@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: stolon-keeper
+spec:
+  serviceName: stolon-keeper
+  replicas: 3
+  selector:
+    matchLabels:
+      component: stolon-keeper
+      stolon-cluster: stolon
+  template:
+    metadata:
+      labels:
+        component: stolon-keeper
+        stolon-cluster: stolon
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: stolon-keeper
+          image: villekalliomaki/stolon
+          command:
+            - "/bin/bash"
+            - "-ec"
+            - |
+              # Generate our keeper uid using the pod index
+              IFS='-' read -ra ADDR <<< "$(hostname)"
+              export STKEEPER_UID="keeper${ADDR[-1]}"
+              export POD_IP=$(hostname -i)
+              export STKEEPER_PG_LISTEN_ADDRESS=$POD_IP
+              export STOLON_DATA=/stolon-data
+              chown stolon:stolon $STOLON_DATA
+              exec gosu stolon stolon-keeper --data-dir $STOLON_DATA
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: STKEEPER_CLUSTER_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['stolon-cluster']
+            - name: STKEEPER_STORE_BACKEND
+              value: "kubernetes"
+            - name: STKEEPER_KUBE_RESOURCE_KIND
+              value: "configmap"
+            - name: STKEEPER_PG_REPL_USERNAME
+              value: "repluser"
+              # Superuser
+            - name: STKEEPER_PG_REPL_PASSWORD
+              value: "replpassword"
+            - name: STKEEPER_PG_SU_USERNAME
+              value: "stolon"
+            - name: STKEEPER_PG_SU_PASSWORDFILE
+              value: "/etc/secrets/stolon/password"
+          ports:
+            - containerPort: 5432
+            - containerPort: 8080
+          volumeMounts:
+            - mountPath: /stolon-data
+              name: data
+            - mountPath: /etc/secrets/stolon
+              name: stolon
+      volumes:
+        - name: stolon
+          secret:
+            secretName: stolon
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-stolon
+        resources:
+          requests:
+            storage: 10Gi
