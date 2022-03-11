@@ -5,6 +5,9 @@ metadata:
   name: hashicorp-vault-tls
 spec:
   secretName: hashicorp-vault-tls
+  # Note on renewal:
+  # There is no mechanism to automatically make update certs used by Vault
+  # when they are renewed by cert-manager. The pods have to be recreated/restarted(?).
   duration: 720h # 30 days
   renewBefore: 72h # 3 days
   # For pod-internal vault CLI
