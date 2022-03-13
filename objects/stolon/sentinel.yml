@@ -3,16 +3,16 @@ kind: Deployment
 metadata:
   name: stolon-sentinel
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       component: stolon-sentinel
-      stolon-cluster: kube-stolon
+      stolon-cluster: stolon-cluster
   template:
     metadata:
       labels:
         component: stolon-sentinel
-        stolon-cluster: kube-stolon
+        stolon-cluster: stolon-cluster
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8080"

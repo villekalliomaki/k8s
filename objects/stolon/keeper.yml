@@ -8,12 +8,12 @@ spec:
   selector:
     matchLabels:
       component: stolon-keeper
-      stolon-cluster: stolon
+      stolon-cluster: stolon-cluster
   template:
     metadata:
       labels:
         component: stolon-keeper
-        stolon-cluster: stolon
+        stolon-cluster: stolon-cluster
     spec:
       terminationGracePeriodSeconds: 10
       containers:
