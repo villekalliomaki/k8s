@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flame
+  labels:
+    app: flame
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: flame
+  template:
+    metadata:
+      labels:
+        app: flame
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-status: "update"
+        vault.hashicorp.com/role: "flame"
+        vault.hashicorp.com/agent-inject-secret-pwd: "flame/config"
+        vault.hashicorp.com/agent-inject-template-pwd: |
+          {{- with secret "flame/config" -}}
+            export PASSWORD={{ .Data.data.password }}
+          {{- end -}}
+        vault.hashicorp.com/tls-skip-verify: "true"
+    spec:
+      serviceAccountName: flame
+      containers:
+        - name: flame
+          image: pawelmalak/flame:multiarch2.3.0
+          ports:
+            - containerPort: 5005
+              name: http
+          command:
+            - "/bin/sh"
+            - "-c"
+            - "source /vault/secrets/pwd && chown -R node /app/data && node server.js"
+          volumeMounts:
+            - name: flame
+              mountPath: /app/data
+      volumes:
+        - name: flame
+          persistentVolumeClaim:
+            claimName: flame
