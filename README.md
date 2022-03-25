@@ -3,6 +3,7 @@
 ### Components
 - Hashicorp Vault
 - KeyDB
+- [Flame](https://github.com/pawelmalak/flame)
 
 ### `/objects`
 
