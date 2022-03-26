@@ -1,8 +1,10 @@
 # Kubernetes cluster
 
 ### Components
+- Cluster TLS issuer
 - Hashicorp Vault
-- KeyDB
+- KeyDB (Redis)
+- Stolon (PostgreSQL)
 - [Flame](https://github.com/pawelmalak/flame)
 
 ### `/objects`
