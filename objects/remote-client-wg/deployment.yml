@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: remote-client-wireguard
+  labels:
+    app: remote-client-wireguard
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: remote-client-wireguard
+  template:
+    metadata:
+      labels:
+        app: remote-client-wireguard
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "remote-client-wireguard"
+        vault.hashicorp.com/agent-inject-secret-wg-config: "remoteClientWG/data"
+        vault.hashicorp.com/agent-inject-template-wg-config: |
+          {{- with secret "remoteClientWG/data/server" -}}
+          [Interface]
+          Address = 10.0.0.1/24
+          PrivateKey = {{ .Data.data.privateKey }}
+          ListenPort = 51820
+          {{- end -}}
+
+          # For forwarding to LAN
+          PostUp   = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+          PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+          {{- with secret "remoteClientWG/data/clients" -}}
+          # Laptop
+          [Peer]
+          PublicKey = {{ .Data.data.publicKeyLaptop }}
+          AllowedIPs = 10.0.0.2/32
+
+          # Phone 6T
+          [Peer]
+          PublicKey = {{ .Data.data.publicKeyPhone6T }}
+          AllowedIPs = 10.0.0.3/32
+
+          # Ipad
+          [Peer]
+          PublicKey = {{ .Data.data.publicKeyIpad }}
+          AllowedIPs = 10.0.0.4/32
+
+          # Phone 3T
+          [Peer]
+          PublicKey = {{ .Data.data.publicKey3T }}
+          AllowedIPs = 10.0.0.5/32
+          {{- end -}}
+        vault.hashicorp.com/tls-skip-verify: "true"
+    spec:
+      # Run locally, traffic forwarded from router. Reduces latency.
+      nodeSelector:
+        kubernetes.io/hostname: cypress
+      serviceAccountName: remote-client-wireguard
+      restartPolicy: Always
+      # IP forwarding is needed to access Kubernetes IP blocks
+      # and other local network devices.
+      # - Bounces traffic to cloud nodes?
+      initContainers:
+        - name: init-ip-forward
+          image: busybox:latest
+          command:
+            - sh
+            - -c
+            - sysctl -w net.ipv4.ip_forward=1 && sysctl -w net.ipv4.conf.all.forwarding=1
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - NET_ADMIN
+      containers:
+        - name: wireguard-server
+          image: linuxserver/wireguard:latest
+          securityContext:
+            privileged: true
+            capabilities:
+              add:
+                - NET_ADMIN
+          ports:
+            - containerPort: 51820
+              protocol: UDP
+          command:
+            - sh
+            - -c
+            - cp /vault/secrets/wg-config /config/wg0.conf && /init
+          env:
+            - name: LOG_LEVEL
+              value: info
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: Europe/Helsinki
+          resources:
+            requests:
+              memory: "50Mi"
+            limits:
+              memory: "150Mi"
