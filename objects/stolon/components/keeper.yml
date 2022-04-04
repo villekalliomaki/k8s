@@ -8,13 +8,29 @@ spec:
   selector:
     matchLabels:
       component: stolon-keeper
-      stolon-cluster: stolon-cluster
+      stolon-cluster: stolon-prod
   template:
     metadata:
       labels:
         component: stolon-keeper
-        stolon-cluster: stolon-cluster
+        stolon-cluster: stolon-prod
+      annotations:
+        # Vault
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-status: "update"
+        vault.hashicorp.com/role: "stolon"
+        vault.hashicorp.com/agent-inject-secret-config-env: "stolon/config"
+        vault.hashicorp.com/agent-inject-template-config-env: |
+          {{- with secret "stolon/config" -}}
+            export STKEEPER_PG_REPL_PASSWORD={{ .Data.data.replPassword }}
+            export STKEEPER_PG_SU_PASSWORD={{ .Data.data.superuserPassword }}
+          {{- end -}}
+        vault.hashicorp.com/tls-skip-verify: "true"
+        # Metrics
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
     spec:
+      serviceAccountName: stolon
       terminationGracePeriodSeconds: 10
       containers:
         - name: stolon-keeper
@@ -29,7 +45,7 @@ spec:
               export POD_IP=$(hostname -i)
               export STKEEPER_PG_LISTEN_ADDRESS=$POD_IP
               export STOLON_DATA=/stolon-data
-              chown stolon:stolon $STOLON_DATA
+              chown stolon:stolon $STOLON_DATA && source /vault/secrets/config-env
               exec gosu stolon stolon-keeper --data-dir $STOLON_DATA
           env:
             - name: POD_NAME
@@ -46,25 +62,19 @@ spec:
               value: "configmap"
             - name: STKEEPER_PG_REPL_USERNAME
               value: "repluser"
-              # Superuser
-            - name: STKEEPER_PG_REPL_PASSWORD
-              value: "replpassword"
             - name: STKEEPER_PG_SU_USERNAME
               value: "stolon"
-            - name: STKEEPER_PG_SU_PASSWORDFILE
-              value: "/etc/secrets/stolon/password"
+            - name: STKEEPER_METRICS_LISTEN_ADDRESS
+              value: "0.0.0.0:8080"
+            ## Uncomment this to enable debug logs
+            # - name: STKEEPER_DEBUG
+            #   value: "true
           ports:
             - containerPort: 5432
             - containerPort: 8080
           volumeMounts:
             - mountPath: /stolon-data
               name: data
-            - mountPath: /etc/secrets/stolon
-              name: stolon
-      volumes:
-        - name: stolon
-          secret:
-            secretName: stolon
   volumeClaimTemplates:
     - metadata:
         name: data

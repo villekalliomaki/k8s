@@ -1,47 +1,57 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: stolon-sentinel
+  name: stolon-proxy
 spec:
   replicas: 3
   selector:
     matchLabels:
-      component: stolon-sentinel
-      stolon-cluster: stolon-cluster
+      component: stolon-proxy
+      stolon-cluster: stolon-prod
   template:
     metadata:
       labels:
-        component: stolon-sentinel
-        stolon-cluster: stolon-cluster
+        component: stolon-proxy
+        stolon-cluster: stolon-prod
       annotations:
+        # Metrics
         prometheus.io/scrape: "true"
         prometheus.io/port: "8080"
     spec:
+      serviceAccountName: stolon
       containers:
-        - name: stolon-sentinel
+        - name: stolon-proxy
           image: villekalliomaki/stolon
           command:
             - "/bin/bash"
             - "-ec"
             - |
-              exec gosu stolon stolon-sentinel
+              exec gosu stolon stolon-proxy
           env:
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            - name: STSENTINEL_CLUSTER_NAME
+            - name: STPROXY_CLUSTER_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['stolon-cluster']
-            - name: STSENTINEL_STORE_BACKEND
+            - name: STPROXY_STORE_BACKEND
               value: "kubernetes"
-            - name: STSENTINEL_KUBE_RESOURCE_KIND
+            - name: STPROXY_KUBE_RESOURCE_KIND
               value: "configmap"
-            - name: STSENTINEL_METRICS_LISTEN_ADDRESS
+            - name: STPROXY_LISTEN_ADDRESS
+              value: "0.0.0.0"
+            - name: STPROXY_METRICS_LISTEN_ADDRESS
               value: "0.0.0.0:8080"
             ## Uncomment this to enable debug logs
-            - name: STSENTINEL_DEBUG
-              value: "true"
+            # - name: STPROXY_DEBUG
+            #   value: "true"
           ports:
+            - containerPort: 5432
             - containerPort: 8080
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
