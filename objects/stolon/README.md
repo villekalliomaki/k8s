@@ -12,7 +12,7 @@ kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --ove
 
 ## Docker image
 
-[The image](https://hub.docker.com/r/villekalliomaki/stolon/) is built from a from based on stolon master branch. Multi-arch with support for amd64 and arm64.
+[The image](https://hub.docker.com/r/villekalliomaki/stolon/) is built from a fork based on the stolon master branch. Multi-arch with support for amd64 and arm64.
 
 ## Backups (planned)
 

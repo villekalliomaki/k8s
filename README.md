@@ -9,6 +9,7 @@
 - Wireguard
     - Node to node
     - Remotely to cluster
+- Keycloak
 
 ### `/objects`
 
