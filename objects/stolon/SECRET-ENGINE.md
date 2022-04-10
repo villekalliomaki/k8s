@@ -1,6 +1,6 @@
 # Hashicorp Vault secret engine
 
-Stolon database user management and password rotation. Vault is the source for all credentials, pushing them to Stolon while applications pull them from Vault. When a new user is created, it becomes the owner of a database with the same name.
+Stolon database user management and password rotation. The credentials are created dynamically when requested from Vault.
 
 [Vault Docs](https://www.vaultproject.io/docs/secrets/databases/postgresql)
 
@@ -13,24 +13,27 @@ vault secrets enable database
 
 # Username and password will be formatted to the connection URL.
 # Only replace the key values.
-vault write database/config/stolon-prod \
+vault write database/config/stolon_prod \
     plugin_name=postgresql-database-plugin \
-    allowed_roles="stolon-prod-user" \
-    connection_url="postgresql://{{username}}:{{password}}@stolon-proxy:5432/" \
+    allowed_roles="stolon_prod_user" \
+    connection_url="postgresql://{{username}}:{{password}}@stolon-proxy:5432/postgres?sslmode=disable" \
     username="replace_this" \
     password="replace_this"
 ```
 
+
+## Creating a database role
+
 The database user role description. SQL statement [reference](https://www.vaultproject.io/api-docs/secret/databases/postgresql#statements).
+A new role is created for each new database client. SQL statements can be altered per user as seen fit.
 
-### Create
+*Note that "-" should be replaced with "_" in role names.*
 
-Create the new user with the default database.
 
 ```sql
-CREATE DATABASE {{username}}-user-db;
+CREATE DATABASE {{username}}_default;
 CREATE USER {{username}} WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
-GRANT ALL PRIVILEGES ON {{username}}-user-db TO {{username}};
+GRANT ALL PRIVILEGES ON {{username}}_default TO {{username}};
 ```
 
 ### Revoke
@@ -43,29 +46,29 @@ ALTER USER {{username}} WITH NOLOGIN;
 
 ### Renew
 
-???
+Enable login for the user.
 
 ```sql
-SQL ...
+ALTER USER {{username}} WITH LOGIN;
 ```
 
 ### Rotation
 
-Password rotation of an user.
+Change the password of the user.
 
 ```sql
 ALTER USER {{username}} WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
 ```
 
-### 
+### Apply the role
 
 ```sh
-vault write database/roles/stolon-prod-user \
-    db_name=stolon-prod \
-    creation_statements="" \
-    revocation_statements="" \
-    renew_statements="" \
-    rotation_statements="" \
-    default_ttl="1h" \
-    max_ttl="24h"
+vault write database/roles/role_here \
+    db_name=stolon_prod \
+    creation_statements="CREATE DATABASE {{username}}_default; CREATE USER {{username}} WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; GRANT ALL PRIVILEGES ON {{username}}_default TO {{username}};" \
+    revocation_statements="ALTER USER {{username}} WITH NOLOGIN;" \
+    renew_statements="ALTER USER {{username}} WITH LOGIN;" \
+    rotation_statements="ALTER USER {{username}} WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';" \
+    default_ttl="7d" \
+    max_ttl="30d"
 ```

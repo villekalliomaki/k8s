@@ -7,7 +7,7 @@ Currently running 3 nodes of each component.
 ## Initialize a new cluster
 
 ```
-kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap init
+kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap init --log-level warn '{ "ssl": true, "ssl_cert_file": "", "ssl_key_file": "" }'
 ```
 
 ## Docker image

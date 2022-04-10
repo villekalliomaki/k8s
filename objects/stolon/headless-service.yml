@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: stolon-keeper-headless
+spec:
+  clusterIP: None
+  ports:
+    - port: 5432
+  selector:
+    app: stolon-keeper
+    component: stolon-keeper

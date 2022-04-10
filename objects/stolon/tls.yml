@@ -1,0 +1,20 @@
+## TLS certificate for both the keepers and the proxies.
+## Used for replication and client connections.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: stolon-tls
+spec:
+  secretName: stolon-tls
+  duration: 720h # 30 days
+  renewBefore: 72h # 3 days
+  dnsNames:
+    - stolon-proxy
+    - stolon-keeper-0.stolon-keeper-headless
+    - stolon-keeper-1.stolon-keeper-headless
+    - stolon-keeper-2.stolon-keeper-headless
+  commonName: stolon-proxy
+  issuerRef:
+    name: root-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
