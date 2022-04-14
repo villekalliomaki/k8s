@@ -6,8 +6,14 @@ Currently running 3 nodes of each component.
 
 ## Initialize a new cluster
 
+```sh
+kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap init
 ```
-kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap init --log-level warn '{ "ssl": true, "ssl_cert_file": "", "ssl_key_file": "" }'
+
+Additionally path the cluster to enable TLS.
+
+```sh
+kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap update --patch '{ "ssl": true, "ssl_cert_file": "/stolon-tls/tls.crt", "ssl_key_file": "/stolon-tls/tls.key" }'
 ```
 
 ## Docker image

@@ -75,6 +75,14 @@ spec:
           volumeMounts:
             - mountPath: /stolon-data
               name: data
+            # TLS certs + key
+            - mountPath: /stolon-tls
+              name: stolon-tls
+              readOnly: true
+      volumes:
+        - name: stolon-tls
+          secret:
+            secretName: stolon-tls
   volumeClaimTemplates:
     - metadata:
         name: data
