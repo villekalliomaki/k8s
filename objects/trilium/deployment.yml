@@ -31,7 +31,7 @@ spec:
             claimName: trilium
       initContainers:
         # Fix permissions, if they have changed.
-        # (Usually when copying over and old instance)
+        # (Usually when copying over an old instance data)
         - name: init-trilium
           image: busybox:1.28
           command: ["sh", "-c", "chmod 777 /home/node/trilium-data"]

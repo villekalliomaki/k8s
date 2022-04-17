@@ -6,4 +6,4 @@ Note taking application.
 
 ## Upgrades
 
-Change the image tag to [the new version](https://hub.docker.com/r/zadam/trilium/tags).
+Change the image tag to [the new version](https://hub.docker.com/r/zadam/trilium/tags). Using specific version tags (never use anything containing `latest`).
