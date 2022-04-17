@@ -10,6 +10,7 @@
     - Node to node
     - Remotely to cluster
 - Keycloak
+- [Trilium](https://github.com/zadam/trilium)
 
 ### `/objects`
 
