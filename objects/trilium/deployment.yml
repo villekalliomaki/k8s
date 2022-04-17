@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trilium
+  labels:
+    app: trilium
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trilium
+  template:
+    metadata:
+      labels:
+        app: trilium
+    spec:
+      containers:
+        - name: trilium
+          image: zadam/trilium:0.50.3
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: trilium
+              mountPath: /home/node/trilium-data
+      volumes:
+        - name: trilium
+          persistentVolumeClaim:
+            claimName: trilium
+      initContainers:
+        # Fix permissions, if they have changed.
+        # (Usually when copying over and old instance)
+        - name: init-trilium
+          image: busybox:1.28
+          command: ["sh", "-c", "chmod 777 /home/node/trilium-data"]
+          volumeMounts:
+            - name: trilium
+              mountPath: /home/node/trilium-data
