@@ -36,28 +36,29 @@ spec:
                 - cypress
 ---
 ## Degray
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: stolon-degray
-spec:
-  capacity:
-    storage: 10Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-stolon
-  local:
-    path: /mnt/stolon
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - degray
+## The node has been removed.
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: stolon-degray
+# spec:
+#   capacity:
+#     storage: 10Gi
+#   volumeMode: Filesystem
+#   accessModes:
+#     - ReadWriteOnce
+#   persistentVolumeReclaimPolicy: Retain
+#   storageClassName: local-stolon
+#   local:
+#     path: /mnt/stolon
+#   nodeAffinity:
+#     required:
+#       nodeSelectorTerms:
+#         - matchExpressions:
+#             - key: kubernetes.io/hostname
+#               operator: In
+#               values:
+#                 - degray
 ---
 ## Ozarks
 apiVersion: v1
@@ -82,3 +83,26 @@ spec:
               operator: In
               values:
                 - ozarks
+## Bluewater
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: stolon-bluewater
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-stolon
+  local:
+    path: /mnt/stolon
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - bluewater

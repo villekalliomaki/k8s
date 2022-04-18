@@ -34,28 +34,29 @@ spec:
                 - cypress
 ---
 ## Degray
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: keydb-degray
-spec:
-  capacity:
-    storage: 3Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-keydb
-  local:
-    path: /mnt/keydb
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values:
-                - degray
+## The node has been removed.
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: keydb-degray
+# spec:
+#   capacity:
+#     storage: 3Gi
+#   volumeMode: Filesystem
+#   accessModes:
+#     - ReadWriteOnce
+#   persistentVolumeReclaimPolicy: Retain
+#   storageClassName: local-keydb
+#   local:
+#     path: /mnt/keydb
+#   nodeAffinity:
+#     required:
+#       nodeSelectorTerms:
+#         - matchExpressions:
+#             - key: kubernetes.io/hostname
+#               operator: In
+#               values:
+#                 - degray
 ---
 ## Ozarks
 apiVersion: v1
@@ -80,3 +81,27 @@ spec:
               operator: In
               values:
                 - ozarks
+---
+## Bluewater
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: keydb-bluewater
+spec:
+  capacity:
+    storage: 3Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-keydb
+  local:
+    path: /mnt/keydb
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - bluewater
