@@ -45,7 +45,15 @@ spec:
               export POD_IP=$(hostname -i)
               export STKEEPER_PG_LISTEN_ADDRESS=$POD_IP
               export STOLON_DATA=/stolon-data
-              chown stolon:stolon $STOLON_DATA && source /vault/secrets/config-env
+              # Copy the TLS certificate and the key to a stolon owned directory.
+              # Change their permissions so they are readable.
+              mkdir -p /stolon-tls-runtime
+              cp /stolon-tls/{tls.key,tls.crt} /stolon-tls-runtime/
+              chown stolon:stolon $STOLON_DATA
+              chown stolon:stolon /stolon-tls-runtime/{tls.key,tls.crt}
+              chmod 0600 /stolon-tls-runtime/{tls.key,tls.crt}
+              # Get superuser credentials from a Vault produced environment.
+              source /vault/secrets/config-env
               exec gosu stolon stolon-keeper --data-dir $STOLON_DATA
           env:
             - name: POD_NAME

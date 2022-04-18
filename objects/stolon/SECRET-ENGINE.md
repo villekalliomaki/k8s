@@ -16,6 +16,7 @@ vault secrets enable database
 vault write database/config/stolon_prod \
     plugin_name=postgresql-database-plugin \
     allowed_roles="stolon_prod_user" \
+    username_template="{{.RoleName | lowercase | replace \"-\" \"_\"}}_prod" \
     connection_url="postgresql://{{username}}:{{password}}@stolon-proxy:5432/postgres?sslmode=disable" \
     username="replace_this" \
     password="replace_this"
@@ -25,15 +26,10 @@ vault write database/config/stolon_prod \
 ## Creating a database role
 
 The database user role description. SQL statement [reference](https://www.vaultproject.io/api-docs/secret/databases/postgresql#statements).
-A new role is created for each new database client. SQL statements can be altered per user as seen fit.
-
-*Note that "-" should be replaced with "_" in role names.*
-
+A new role is created for each new database client. The actual username of the role is something like`lowercase_username_prod`.
 
 ```sql
-CREATE DATABASE {{username}}_default;
 CREATE USER {{username}} WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
-GRANT ALL PRIVILEGES ON {{username}}_default TO {{username}};
 ```
 
 ### Revoke
@@ -62,13 +58,15 @@ ALTER USER {{username}} WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{ex
 
 ### Apply the role
 
+Because the username is replaced with something like `v-root-stolonpr-QVpbXuK1EK9500q21pV4-1650216546`, quoting the formatted username is required in SQL.
+
 ```sh
 vault write database/roles/role_here \
     db_name=stolon_prod \
-    creation_statements="CREATE DATABASE {{username}}_default; CREATE USER {{username}} WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; GRANT ALL PRIVILEGES ON {{username}}_default TO {{username}};" \
-    revocation_statements="ALTER USER {{username}} WITH NOLOGIN;" \
-    renew_statements="ALTER USER {{username}} WITH LOGIN;" \
-    rotation_statements="ALTER USER {{username}} WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';" \
+    creation_statements="CREATE USER \"{{name}}\" WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';" \
+    revocation_statements="ALTER USER \"{{name}}\" WITH NOLOGIN;" \
+    renew_statements="ALTER USER \"{{name}}\" WITH LOGIN;" \
+    rotation_statements="ALTER USER \"{{name}}\" WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';" \
     default_ttl="7d" \
     max_ttl="30d"
 ```

@@ -10,10 +10,18 @@ Currently running 3 nodes of each component.
 kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap init
 ```
 
-Additionally path the cluster to enable TLS.
+Additionally patch the cluster to enable TLS.
 
 ```sh
-kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap update --patch '{ "ssl": true, "ssl_cert_file": "/stolon-tls/tls.crt", "ssl_key_file": "/stolon-tls/tls.key" }'
+kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap update --patch '{ "pgParameters": { "ssl": "true", "ssl_cert_file": "/stolon-tls-runtime/tls.crt", "ssl_key_file": "/stolon-tls-runtime/tls.key" } }'
+```
+
+## Cluster state
+
+View the current cluster status. Replace `status` with `spec` to see pgParameters.
+
+```sh
+kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap status
 ```
 
 ## Docker image
