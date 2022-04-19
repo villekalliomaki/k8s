@@ -1,11 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: stolon-keeper-headless
+  name: stolon-keeper
 spec:
   clusterIP: None
+  selector:
+    component: stolon-keeper
+    stolon-cluster: stolon-prod
   ports:
     - port: 5432
-  selector:
-    app: stolon-keeper
-    component: stolon-keeper
+      protocol: TCP
