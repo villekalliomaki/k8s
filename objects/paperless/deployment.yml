@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperless
+  labels:
+    app: paperless
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paperless
+  template:
+    metadata:
+      labels:
+        app: paperless
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-status: "update"
+        vault.hashicorp.com/role: "paperless"
+        vault.hashicorp.com/agent-inject-secret-config: "database/static-creds/paperless"
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{- with secret "database/static-creds/paperless" -}}
+          export PAPERLESS_DBPASS={{ .Data.data.password }}
+          {{- end -}}
+
+          {{- with secret "keydb/config" -}}
+          export PAPERLESS_REDIS=redis://:{{ .Data.data.password }}@keydb:6379/2
+          {{- end -}}
+
+          {{- with secret "paperless/config" -}}
+          export PAPERLESS_ADMIN_USER={{ .Data.data.adminUser }}
+          export PAPERLESS_ADMIN_MAIL={{ .Data.data.adminEmail }}
+          export PAPERLESS_ADMIN_PASSWORD={{ .Data.data.adminPassword }}
+          {{- end -}}
+        vault.hashicorp.com/tls-skip-verify: "true"
+    spec:
+      serviceAccountName: paperless
+      containers:
+        - name: paperless
+          image: jonaswinkler/paperless-ng:1.5.0
+          ports:
+            - containerPort: 8000
+          command:
+            - "/bin/sh"
+            - "-c"
+            - "source /vault/secrets/config && /usr/local/bin/supervisord -c /etc/supervisord.conf"
+          volumeMounts:
+            - name: paperless
+              mountPath: /usr/src/paperless/data
+              subPath: data
+            - name: paperless
+              mountPath: /usr/src/paperless/media
+              subPath: media
+            # Export and import directories could be moved to usable remote volume
+            - name: paperless
+              mountPath: /usr/src/paperless/export
+              subPath: export
+            - name: paperless
+              mountPath: /usr/src/paperless/consume
+              subPath: consume
+          env:
+            # PostgreSQL
+            - name: PAPERLESS_DBHOST
+              value: stolon-proxy
+            # OCR
+            - name: PAPERLESS_OCR_LANGUAGE
+              value: fin
+            - name: PAPERLESS_OCR_LANGUAGES
+              value: fin
+            # Misc.
+            - name: PAPERLESS_TIME_ZONE
+              value: Europe/Helsinki
+      volumes:
+        - name: paperless
+          persistentVolumeClaim:
+            claimName: paperless
