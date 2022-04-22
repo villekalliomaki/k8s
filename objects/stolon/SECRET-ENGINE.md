@@ -1,8 +1,10 @@
 # Hashicorp Vault secret engine
 
-Stolon database user management and password rotation. The credentials are created dynamically when requested from Vault.
+Stolon credentials are rotated by Vault.
 
 [Vault Docs](https://www.vaultproject.io/docs/secrets/databases/postgresql)
+
+[Static roles](https://learn.hashicorp.com/tutorials/vault/database-creds-rotation)
 
 ## Installation
 
@@ -15,58 +17,20 @@ vault secrets enable database
 # Only replace the key values.
 vault write database/config/stolon_prod \
     plugin_name=postgresql-database-plugin \
-    allowed_roles="stolon_prod_user" \
-    username_template="{{.RoleName | lowercase | replace \"-\" \"_\"}}_prod" \
+    allowed_roles="*" \
     connection_url="postgresql://{{username}}:{{password}}@stolon-proxy:5432/postgres?sslmode=disable" \
     username="replace_this" \
     password="replace_this"
 ```
 
-
 ## Creating a database role
 
-The database user role description. SQL statement [reference](https://www.vaultproject.io/api-docs/secret/databases/postgresql#statements).
-A new role is created for each new database client. The actual username of the role is something like`lowercase_username_prod`.
-
-```sql
-CREATE USER {{username}} WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
-```
-
-### Revoke
-
-Lock the user. The user or their databases are not deleted.
-
-```sql
-ALTER USER {{username}} WITH NOLOGIN;
-```
-
-### Renew
-
-Enable login for the user.
-
-```sql
-ALTER USER {{username}} WITH LOGIN;
-```
-
-### Rotation
-
-Change the password of the user.
-
-```sql
-ALTER USER {{username}} WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';
-```
-
-### Apply the role
-
-Because the username is replaced with something like `v-root-stolonpr-QVpbXuK1EK9500q21pV4-1650216546`, quoting the formatted username is required in SQL.
+Database roles are static, and only their password is rotated. When reading the secret the existing valid password is returned. The database user (the `username` key) must exist before creating the role.
 
 ```sh
-vault write database/roles/role_here \
+vault write database/static-roles/role_here \
+    username="role_here" \
     db_name=stolon_prod \
-    creation_statements="CREATE USER \"{{name}}\" WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';" \
-    revocation_statements="ALTER USER \"{{name}}\" WITH NOLOGIN;" \
-    renew_statements="ALTER USER \"{{name}}\" WITH LOGIN;" \
-    rotation_statements="ALTER USER \"{{name}}\" WITH ENCRYPTED PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';" \
-    default_ttl="7d" \
-    max_ttl="30d"
+    rotation_statements="ALTER USER \"{{name}}\" WITH ENCRYPTED PASSWORD '{{password}}';" \
+    rotation_period="7d"
 ```
