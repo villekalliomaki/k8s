@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hastebin
+  labels:
+    app: hastebin
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hastebin
+  template:
+    metadata:
+      labels:
+        app: hastebin
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-status: "update"
+        vault.hashicorp.com/role: "hastebin"
+        vault.hashicorp.com/agent-inject-secret-redis-password: "keydb/data/config"
+        vault.hashicorp.com/agent-inject-template-redis-password: |
+          {{- with secret "keydb/data/config" -}}
+          export STORAGE_PASSWORD={{ .Data.data.password }}
+          {{- end -}}
+        vault.hashicorp.com/tls-skip-verify: "true"
+    spec:
+      serviceAccountName: hastebin
+      containers:
+        - name: hastebin
+          image: modem7/hastebin:latest
+          ports:
+            - containerPort: 80
+              name: http
+          command:
+            - "/bin/sh"
+            - "-c"
+            - "source /vault/secrets/redis-password && npm start"
+          env:
+            - name: PORT
+              value: "80"
+            - name: STORAGE_TYPE
+              value: redis
+            - name: STORAGE_HOST
+              value: keydb
+            - name: STORAGE_PORT
+              value: "6379"
+            - name: STORAGE_DB
+              value: "3"
+            - name: KEYGENERATOR_TYPE
+              value: random
