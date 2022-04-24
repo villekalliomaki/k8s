@@ -16,6 +16,12 @@ Additionally patch the cluster to enable TLS.
 kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap update --patch '{ "pgParameters": { "ssl": "true", "ssl_cert_file": "/stolon-tls-runtime/tls.crt", "ssl_key_file": "/stolon-tls-runtime/tls.key" } }'
 ```
 
+Because of some upstream libpq issue only affecting arm64 build, md5 password hashes have to be used. The command patches the cluster to use md5 instead of scram-sha-256. All passwords have to be reset after the change.
+
+```sh
+kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap update --patch '{ "pgParameters": { "password_encryption": "md5" } }'
+```
+
 ## Cluster state
 
 View the current cluster status. Replace `status` with `spec` to see pgParameters.
