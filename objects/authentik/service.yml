@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentik
+spec:
+  selector:
+    app: authentik
+    # Probably server?
+    authentik-component: server
+  ports:
+    - port: 9000
+      name: http
+      protocol: TCP
+    - port: 9443
+      name: https
+      protocol: TCP
