@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uptime-kuma
+  labels:
+    app: uptime-kuma
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uptime-kuma
+  template:
+    metadata:
+      labels:
+        app: uptime-kuma
+    spec:
+      containers:
+        - name: uptime-kuma-server
+          image: louislam/uptime-kuma:1.15.1
+          env:
+            - name: UPTIME_KUMA_PORT
+              value: "80"
+          ports:
+            - containerPort: 80
+              name: web
+          volumeMounts:
+            - name: storage
+              mountPath: /app/data
+          livenessProbe:
+            exec:
+              command:
+                - node
+                - extra/healthcheck.js
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: uptime-kuma
