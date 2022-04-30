@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: authentik
+  name: authentik-server
   labels:
     app: authentik
+    authentik-component: server
 spec:
   replicas: 1
   selector:
@@ -22,7 +23,7 @@ spec:
         vault.hashicorp.com/agent-inject-secret-authentik-env: "authentik/data/config"
         vault.hashicorp.com/agent-inject-template-authentik-env: |
           {{- with secret "authentik/data/config" -}}
-            export AUTHENTIK_SECRET_KEY="{{ .Data.data.secretKey }}"
+            export AUTHENTIK_SECRET_KEY="{{ .Data.data.secretKey }}" \n
           {{- end -}}
 
           {{- with secret "email/data/system" -}}
@@ -30,13 +31,12 @@ spec:
             export AUTHENTIK_EMAIL__USERNAME={{ .Data.data.username }}
             export AUTHENTIK_EMAIL__PASSWORD="{{ .Data.data.password }}"
             export AUTHENTIK_EMAIL__USE_TLS=true
-            export AUTHENTIK_EMAIL__FROM="{{ .Data.data.from }}"
+            export AUTHENTIK_EMAIL__FROM="{{ .Data.data.from }}" \n
           {{- end -}}
 
           {{- with secret "external/data/maxmind" -}}
             export GEOIPUPDATE_ACCOUNT_ID={{ .Data.data.accountId }}
-            export GEOIPUPDATE_LICENSE_KEY={{ .Data.data.licenseKey }}
-            export AUTHENTIK_AUTHENTIK__GEOIP="/geoip/GeoLite2-City.mmdb"
+            export GEOIPUPDATE_LICENSE_KEY={{ .Data.data.licenseKey }} \n
           {{- end -}}
 
           {{- with secret "keydb/data/config" -}}
@@ -44,14 +44,14 @@ spec:
             export AUTHENTIK_REDIS__CACHE_DB=4
             export AUTHENTIK_REDIS__MESSAGE_QUEUE_DB=5
             export AUTHENTIK_REDIS__WS_DB=6
-            export AUTHENTIK_REDIS__PASSWORD="{{ .Data.data.password }}"
+            export AUTHENTIK_REDIS__PASSWORD="{{ .Data.data.password }}" \n
           {{- end -}}
 
           {{- with secret "database/static-creds/authentik" -}}
             export AUTHENTIK_POSTGRESQL__HOST=stolon-proxy
             export AUTHENTIK_POSTGRESQL__NAME=authentik
             export AUTHENTIK_POSTGRESQL__USER=authentik
-            export AUTHENTIK_POSTGRESQL__PASSWORD="{{ .Data.password }}"
+            export AUTHENTIK_POSTGRESQL__PASSWORD="{{ .Data.password }}" \n
           {{- end -}}
         vault.hashicorp.com/tls-skip-verify: "true"
     spec:
@@ -70,3 +70,12 @@ spec:
             - "/bin/bash"
             - "-c"
             - "source /vault/secrets/authentik-env && /lifecycle/ak server"
+          volumeMounts:
+            # Custom static media
+            - name: authentik
+              mountPath: /media
+              subPath: media
+      volumes:
+        - name: authentik
+          persistentVolumeClaim:
+            claimName: authentik

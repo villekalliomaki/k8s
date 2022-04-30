@@ -5,7 +5,6 @@ metadata:
 spec:
   selector:
     app: authentik
-    # Probably server?
     authentik-component: server
   ports:
     - port: 9000
