@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sonarr
+  labels:
+    app: sonarr
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: sonarr
+  template:
+    metadata:
+      labels:
+        app: sonarr
+    spec:
+      containers:
+        - name: sonarr
+          image: linuxserver/sonarr:version-3.0.8.1507
+          ports:
+            # Web
+            - containerPort: 8989
+              name: web
+          env:
+            - name: TZ
+              value: Europe/Helsinki
+          volumeMounts:
+            # Config
+            - name: sonarr
+              mountPath: /config
+            # Series
+            - name: media
+              mountPath: /tv
+              subPath: tv
+            # Download client downloads
+            - name: media
+              mountPath: /downloads
+              subPath: downloads
+      volumes:
+        # Config
+        - name: sonarr
+          persistentVolumeClaim:
+            claimName: sonarr
+        # Media
+        - name: media
+          persistentVolumeClaim:
+            claimName: local-media
+      # Run on cypress where the disk is
+      nodeSelector:
+        kubernetes.io/hostname: cypress

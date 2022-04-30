@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyfin
+  labels:
+    app: jellyfin
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: jellyfin
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+    spec:
+      containers:
+        - name: jellyfin
+          image: linuxserver/jellyfin:10.7.7
+          ports:
+            # Web
+            - containerPort: 8096
+              name: web
+            # Discovery + DLNA
+            - containerPort: 7359
+              name: discover
+              protocol: UDP
+            - containerPort: 1900
+              name: dlna
+              protocol: UDP
+          env:
+            - name: TZ
+              value: Europe/Helsinki
+          volumeMounts:
+            # Data
+            - name: jellyfin
+              mountPath: /config
+            # Series
+            - name: media
+              mountPath: /data/tvshows
+              subPath: tv
+            # Movies
+            - name: media
+              mountPath: /data/movies
+              subPath: movies
+      volumes:
+        # Data
+        - name: jellyfin
+          persistentVolumeClaim:
+            claimName: jellyfin
+        # Media
+        - name: media
+          persistentVolumeClaim:
+            claimName: local-media
+      # Run on cypress where the disk is
+      nodeSelector:
+        kubernetes.io/hostname: cypress

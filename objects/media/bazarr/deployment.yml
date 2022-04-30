@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bazarr
+  labels:
+    app: bazarr
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: bazarr
+  template:
+    metadata:
+      labels:
+        app: bazarr
+    spec:
+      containers:
+        - name: bazarr
+          image: linuxserver/bazarr:1.0.4
+          ports:
+            # Web
+            - containerPort: 6767
+              name: web
+          env:
+            - name: TZ
+              value: Europe/Helsinki
+          volumeMounts:
+            # Config
+            - name: bazarr
+              mountPath: /config
+              subPath: config
+            # Series
+            - name: media
+              mountPath: /tv
+              subPath: tv
+            # Movies
+            - name: media
+              mountPath: /movies
+              subPath: movies
+      volumes:
+        # Config
+        - name: bazarr
+          persistentVolumeClaim:
+            claimName: bazarr
+        # Media
+        - name: media
+          persistentVolumeClaim:
+            claimName: local-media
+      # Run on cypress where the disk is
+      nodeSelector:
+        kubernetes.io/hostname: cypress

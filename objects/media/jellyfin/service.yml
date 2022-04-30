@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jellyfin
+spec:
+  selector:
+    app: jellyfin
+  ports:
+    - port: 80
+      targetPort: 8096
+      name: web
+    - port: 7359
+      protocol: UDP
+      name: discover
+    - port: 1900
+      protocol: UDP
+      name: dlna

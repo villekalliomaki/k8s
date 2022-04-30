@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transmission
+  labels:
+    app: transmission
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: transmission
+  template:
+    metadata:
+      labels:
+        app: transmission
+    spec:
+      containers:
+        - name: transmission
+          image: linuxserver/transmission:3.00-r5-ls121
+          ports:
+            # Web UI
+            - containerPort: 9091
+              name: http
+            # Torrent traffic
+            - containerPort: 51413
+              protocol: TCP
+              name: tcp-in
+            - containerPort: 51413
+              protocol: UDP
+              name: udp-in
+          env:
+            - name: TZ
+              value: Europe/Helsinki
+            - name: TRANSMISSION_WEB_HOME
+              value: /flood-for-transmission/
+            # Web UI credentials
+            # TODO: Move to Vault
+            - name: USER
+              valueFrom:
+                secretKeyRef:
+                  name: transmission
+                  key: username
+            - name: PASS
+              valueFrom:
+                secretKeyRef:
+                  name: transmission
+                  key: password
+          volumeMounts:
+            # Config
+            - name: transmission
+              mountPath: /config
+              subPath: config
+            # Watch
+            - name: transmission
+              mountPath: /watch
+              subPath: watch
+            # Media
+            - name: media
+              mountPath: /downloads
+              subPath: downloads
+      volumes:
+        # Config
+        - name: transmission
+          persistentVolumeClaim:
+            claimName: transmission
+        # Media
+        - name: media
+          persistentVolumeClaim:
+            claimName: local-media
+      # Run on cypress where the disk is
+      nodeSelector:
+        kubernetes.io/hostname: cypress

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radarr
+  labels:
+    app: radarr
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: radarr
+  template:
+    metadata:
+      labels:
+        app: radarr
+    spec:
+      containers:
+        - name: radarr
+          image: linuxserver/radarr:4.1.0.6175-ls136
+          ports:
+            # Web
+            - containerPort: 7878
+              name: web
+          env:
+            - name: TZ
+              value: Europe/Helsinki
+          volumeMounts:
+            # Config
+            - name: radarr
+              mountPath: /config
+            # Movies
+            - name: media
+              mountPath: /movies
+              subPath: movies
+            # Download client downloads
+            - name: media
+              mountPath: /downloads
+              subPath: downloads
+      volumes:
+        # Config
+        - name: radarr
+          persistentVolumeClaim:
+            claimName: radarr
+        # Media
+        - name: media
+          persistentVolumeClaim:
+            claimName: local-media
+      # Run on cypress where the disk is
+      nodeSelector:
+        kubernetes.io/hostname: cypress
