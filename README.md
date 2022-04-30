@@ -9,8 +9,18 @@
 - Wireguard
     - Node to node
     - Remotely to cluster
-- Keycloak
+- Authentik
 - [Trilium](https://github.com/zadam/trilium)
+- Media
+    - Jellyfin
+    - Transmission
+    - Radarr
+    - Sonarr
+    - Jackett
+    - Bazarr
+- Hastebin
+- Trilium notes
+- Uptime Kuma
 
 ### `/objects`
 
