@@ -30,6 +30,12 @@ View the current cluster status. Replace `status` with `spec` to see pgParameter
 kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap status
 ```
 
+## Manual failover
+
+```sh
+kubectl run -i -t stolonctl --image=villekalliomaki/stolon --restart=Never --overrides='{ "spec": { "serviceAccount": "stolon" }  }' --rm -- /usr/local/bin/stolonctl --cluster-name=stolon-prod --store-backend=kubernetes --kube-resource-kind=configmap failkeeper keeper0
+```
+
 ## Docker image
 
 [The image](https://hub.docker.com/r/villekalliomaki/stolon/) is built from a fork based on the stolon master branch. Multi-arch with support for amd64 and arm64.
