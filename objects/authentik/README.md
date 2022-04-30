@@ -6,4 +6,4 @@
 
 ## Storage
 
-Stolon and KeyDB. Longhorn volume for static media.
+Stolon and KeyDB.

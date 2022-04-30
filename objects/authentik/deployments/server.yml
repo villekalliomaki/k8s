@@ -6,7 +6,7 @@ metadata:
     app: authentik
     authentik-component: server
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: authentik
@@ -70,12 +70,3 @@ spec:
             - "/bin/bash"
             - "-c"
             - "source /vault/secrets/authentik-env && /lifecycle/ak server"
-          volumeMounts:
-            # Custom static media
-            - name: authentik
-              mountPath: /media
-              subPath: media
-      volumes:
-        - name: authentik
-          persistentVolumeClaim:
-            claimName: authentik
