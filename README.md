@@ -32,7 +32,7 @@ Helm charts and chart values.
 
 ### Edge latency
 
-Latency insentisive applications (SSO, single instance databases, master instances) should prefer nodes labeled `edge-latency=low`.
+Latency sentisive applications (SSO, single instance databases, master instances) should prefer nodes labeled `edge-latency=low`.
 
 `requiredDuringSchedulingIgnoredDuringExecution`, `preferredDuringSchedulingIgnoredDuringExecution` and `nodeSelector` are used for pod scheduling.
 
