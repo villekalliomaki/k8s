@@ -19,23 +19,21 @@ spec:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-inject-status: "update"
         vault.hashicorp.com/role: "paperless"
-        vault.hashicorp.com/agent-inject-secret-postgres-env: "database/static-creds/paperless"
-        vault.hashicorp.com/agent-inject-template-postgres-env: |
+        vault.hashicorp.com/agent-inject-secret-env: "database/static-creds/paperless"
+        vault.hashicorp.com/agent-inject-template-env: |
           {{- with secret "database/static-creds/paperless" -}}
-          export PAPERLESS_DBPASS="{{ .Data.password }}"
+          export PAPERLESS_DBPASS="{{ .Data.password }}" \n
           {{- end -}}
-        vault.hashicorp.com/agent-inject-secret-redis-env: "keydb/data/config"
-        vault.hashicorp.com/agent-inject-template-redis-env: |
+
           {{- with secret "keydb/data/config" -}}
-          export PAPERLESS_REDIS=redis://:{{ .Data.data.password }}@keydb:6379/2
-          {{- end -}}
-        vault.hashicorp.com/agent-inject-secret-paperless-env: "paperless/config"
-        vault.hashicorp.com/agent-inject-template-paperless-env: |
+          export PAPERLESS_REDIS="redis://:{{ .Data.data.password }}@keydb:6379/2" \n
+          {{- end -}} 
+
           {{- with secret "paperless/config" -}}
           export PAPERLESS_ADMIN_USER={{ .Data.data.adminUser }}
           export PAPERLESS_ADMIN_MAIL={{ .Data.data.adminEmail }}
-          export PAPERLESS_ADMIN_PASSWORD={{ .Data.data.adminPassword }}
-          export PAPERLESS_SECRET_KEY={{ .Data.data.secretKey }}
+          export PAPERLESS_ADMIN_PASSWORD="{{ .Data.data.adminPassword }}"
+          export PAPERLESS_SECRET_KEY={{ .Data.data.secretKey }} \n
           {{- end -}}
         vault.hashicorp.com/tls-skip-verify: "true"
     spec:
@@ -47,7 +45,7 @@ spec:
             - containerPort: 8000
           command: ["/bin/bash", "-c"]
           args:
-            - "source /vault/secrets/*-env && /sbin/docker-entrypoint.sh"
+            - "source /vault/secrets/env && /sbin/docker-entrypoint.sh /usr/local/bin/supervisord -c /etc/supervisord.conf"
           volumeMounts:
             - name: paperless
               mountPath: /usr/src/paperless/data
