@@ -29,3 +29,15 @@ Kubernetes objects.
 ### `/charts`
 
 Helm charts and chart values.
+
+### Edge latency
+
+Latency insentisive applications (SSO, single instance databases, master instances) should prefer nodes labeled `edge-latency=low`.
+
+`requiredDuringSchedulingIgnoredDuringExecution`, `preferredDuringSchedulingIgnoredDuringExecution` and `nodeSelector` are used for pod scheduling.
+
+[Docs](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/)
+
+### TLS
+
+Internal certificates are issued directly by the cluster `root-ca` without intermediates. Most applications do not automatically apply the updated certs wihtout a restart.
