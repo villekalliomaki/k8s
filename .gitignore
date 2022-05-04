@@ -4,3 +4,6 @@ root-CA*
 # No keys or certificates
 *.crt
 *.key
+
+# Don't leak ingress declarations/domains
+/objects/ingress
