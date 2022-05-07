@@ -18,6 +18,7 @@ spec:
     spec:
       containers:
         - name: uptime-kuma-server
+          # https://hub.docker.com/r/louislam/uptime-kuma/tags
           image: louislam/uptime-kuma:1.15.1
           env:
             - name: UPTIME_KUMA_PORT
