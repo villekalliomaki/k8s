@@ -56,6 +56,16 @@ spec:
         vault.hashicorp.com/tls-skip-verify: "true"
     spec:
       serviceAccountName: authentik
+      # Lower latency to cluster edge.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: edge-latency
+                    operator: In
+                    values:
+                      - low
       containers:
         - name: authentik
           image: ghcr.io/goauthentik/server:2022.4.1
