@@ -21,6 +21,7 @@
 - Hastebin
 - Trilium notes
 - Uptime Kuma
+- Vaultwarden (Bitwarden)
 
 ### `/objects`
 

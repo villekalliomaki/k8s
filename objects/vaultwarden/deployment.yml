@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vaultwarden
+  labels:
+    app: vaultwarden
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: vaultwarden
+  template:
+    metadata:
+      labels:
+        app: vaultwarden
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-status: "update"
+        vault.hashicorp.com/role: "vaultwarden"
+        vault.hashicorp.com/agent-inject-secret-env: "vaultwarden/data/config"
+        vault.hashicorp.com/agent-inject-template-env: |
+          {{- with secret "vaultwarden/data/config" -}}
+          export ADMIN_TOKEN="{{ .Data.data.adminToken }}" \n
+          {{- end -}}
+
+          {{- with secret "database/static-creds/vaultwarden" -}}
+          export DATABASE_URL="postgresql://vaultwarden:{{ .Data.password }}@stolon-proxy:5432/vaultwarden" \n
+          {{- end -}}
+
+          {{- with secret "email/data/system" -}}
+          export SMTP_HOST={{ .Data.data.host }}
+          export SMTP_PORT=465
+          export SMTP_SSL=true
+          export SMTP_EXPLICIT_TLS=false
+          export SMTP_FROM="{{ .Data.data.from }}"
+          export SMTP_USERNAME={{ .Data.data.username }}
+          export SMTP_PASSWORD={{ .Data.data.password }}
+          {{- end -}}
+        vault.hashicorp.com/tls-skip-verify: "true"
+    spec:
+      serviceAccountName: vaultwarden
+      # Lower latency to cluster edge.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: edge-latency
+                    operator: In
+                    values:
+                      - low
+      containers:
+        - name: vaultwarden
+          # https://hub.docker.com/r/vaultwarden/server/tags
+          image: vaultwarden/server:1.24.0
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          command:
+            - "/bin/bash"
+            - "-c"
+            - "source /vault/secrets/env && /start.sh"
+          env:
+            # Login and registeration
+            - name: SIGNUPS_ALLOWED
+              value: "false"
