@@ -6,6 +6,7 @@ ENV SOURCE_ENV_FILE=/vault/secrets/env
 
 # Copy scripts
 COPY . .
+RUN chmod +x /*.sh
 
 # Install packages
 RUN apt update && apt -y upgrade && apt install -y borgbackup postgresql-client sshfs && rm -rf /var/lib/apt/lists/*
