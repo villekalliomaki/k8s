@@ -8,7 +8,7 @@ source "$SOURCE_ENV_FILE"
 
 # Mount the remote backup directory
 echo "Mounting ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH} at /mnt/remote."
-sshfs -odebug,sshfs_debug,loglevel=debug -p 23 "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}" /mnt/remote
+sshfs -odebug,sshfs_debug,loglevel=debug -o StrictHostKeyChecking=no -p 23 "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}" /mnt/remote
 
 # Dump all databases and roles
 echo "Dumping Stolon databases."
