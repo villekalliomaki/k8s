@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM debian:bookworm
 
 # Environment
 ENV DEBIAN_FRONTEND=noninteractive
@@ -13,4 +13,4 @@ RUN apt update && apt -y upgrade && apt install -y borgbackup postgresql-client 
 # Temporary backup directory before data encryption
 RUN mkdir /tmp/backup
 
-CMD ["/entrypoint.sh"]
+CMD ["bash", "-c", "/entrypoint.sh"]
