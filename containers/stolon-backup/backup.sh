@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
 
-echo "Starting backup."
+echo "Starting backup (${SOURCE_ENV_FILE} as environment)."
 
 # Get secrets
 source "$SOURCE_ENV_FILE"
 
 # Mount the remote backup directory
 echo "Mounting ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH} at /mnt/remote."
-sshfs -p 23 "${REMOTE_USER}@${REMOTE_HOST}:${$REMOTE_PATH}" /mnt/remote -o IdentityFile=/vault/secrets/id_rsa -v
+sshfs -p 23 "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}" /mnt/remote -o IdentityFile=/vault/secrets/id_rsa -v
 
 # Dump all databases and roles
 echo "Dumping Stolon databases."
