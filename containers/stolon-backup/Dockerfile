@@ -13,4 +13,7 @@ RUN apt update && apt -y upgrade && apt install -y borgbackup postgresql-client 
 # Temporary backup directory before data encryption
 RUN mkdir /tmp/backup
 
+# Create remote mountpoint
+RUN mkdir /mnt/remote
+
 CMD ["bash", "-c", "/entrypoint.sh"]
