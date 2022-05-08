@@ -8,8 +8,7 @@ source "$SOURCE_ENV_FILE"
 
 # Mount the remote backup directory
 echo "Mounting ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH} at /mnt/remote."
-echo "Using SSH: \n $(cat /vault/secrets/id_rsa) \n"
-sshfs -p 23 "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}" /mnt/remote -o IdentityFile=/vault/secrets/id_rsa -v
+sshfs -p 23 "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}" /mnt/remote
 
 # Dump all databases and roles
 echo "Dumping Stolon databases."
@@ -17,7 +16,7 @@ PGPASSWORD="$POSTGRES_PASSWORD" pg_dumpall -U "$POSTGRES_USER" -h "$POSTGRES_HOS
 
 # Create a new backup
 echo "Creating backup of the dump."
-borg create --stats /mnt/remote::stolon-dumpall-{now}
+borg create --stats /mnt/remote::stolon-dumpall-{now} "/tmp/backup/stolon_pg_dumpall.out"
 
 # Delete temporary file
 rm /tmp/backup/stolon_pg_dumpall.out
