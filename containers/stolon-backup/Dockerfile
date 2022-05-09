@@ -16,4 +16,5 @@ RUN mkdir /tmp/backup
 # Create remote mountpoint
 RUN mkdir /mnt/remote
 
-CMD ["bash", "-c", "/entrypoint.sh"]
+ENTRYPOINT ["bash", "-c", "/entrypoint.sh"]
+CMD ["backup"]
