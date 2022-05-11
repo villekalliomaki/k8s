@@ -9,6 +9,6 @@ else
         -X POST \
         -H "X-Gotify-Key: ${GOTIFY_TOKEN}" \
         -H "Content-Type: application/json" \
-        -d '{"priority": 1, "title": "Stolon Backup Created", "message": '"$(cat /tmp/msg | jq -aRs .)"'}' \
+        -d '{"priority": 1, "title": "Stolon Backup Created", "message": '"$(jq -R -s '.' < /tmp/msg)"'}' \
         "${GOTIFY_ENDPOINT}/message"
 fi
