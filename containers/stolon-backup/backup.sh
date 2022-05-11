@@ -16,7 +16,8 @@ PGPASSWORD="$POSTGRES_PASSWORD" pg_dumpall -U "$POSTGRES_USER" -h "$POSTGRES_HOS
 
 # Create a new backup
 echo "Creating backup of the dump."
-borg create --stats /mnt/remote::stolon-dumpall-{now} "/tmp/backup/stolon_pg_dumpall.out"
+BORG_OUT=$(borg create --stats /mnt/remote::stolon-dumpall-{now} "/tmp/backup/stolon_pg_dumpall.out")
+echo "$BORG_OUT"
 
 # Delete temporary file
 rm /tmp/backup/stolon_pg_dumpall.out
@@ -28,3 +29,6 @@ borgbackup prune -v --keep-daily=14 --keep-weekly=8 --keep-monthly=12 /mnt/remot
 # Unmount remote host
 echo "Unmount /mnt/remote."
 umount /mnt/remote
+
+# Send notification
+/notify.sh "$BORG_OUT"

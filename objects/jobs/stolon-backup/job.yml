@@ -25,7 +25,12 @@ spec:
           export REMOTE_USER={{ .Data.data.remoteUser }}
           export REMOTE_HOST={{ .Data.data.remoteHost }}
           export REMOTE_PATH={{ .Data.data.remotePath }}
-          export BORG_PASSPHRASE={{ .Data.data.borgPassphrase }}
+          export BORG_PASSPHRASE={{ .Data.data.borgPassphrase }} \n
+          {{- end -}}
+
+          {{- with secret "stolon/data/backup" -}}
+          export GOTIFY_TOKEN={{ .Data.data.token }}
+          export GOTIFY_ENDPOINT={{ .Data.data.endpoint }}
           {{- end -}}
         vault.hashicorp.com/tls-skip-verify: "true"
     spec:
