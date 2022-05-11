@@ -22,12 +22,13 @@
 - Trilium notes
 - Uptime Kuma
 - Vaultwarden (Bitwarden)
+- Minio (S3 storage)
 
-### `/objects`
+### Objects
 
 Kubernetes objects.
 
-### `/charts`
+### Charts
 
 Helm charts and chart values.
 
