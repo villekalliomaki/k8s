@@ -29,8 +29,8 @@ spec:
           {{- end -}}
 
           {{- with secret "stolon/data/backup" -}}
-          export GOTIFY_TOKEN={{ .Data.data.token }}
-          export GOTIFY_ENDPOINT={{ .Data.data.endpoint }}
+          export GOTIFY_TOKEN="{{ .Data.data.token }}"
+          export GOTIFY_ENDPOINT="{{ .Data.data.endpoint }}" \n
           {{- end -}}
         vault.hashicorp.com/tls-skip-verify: "true"
     spec:
