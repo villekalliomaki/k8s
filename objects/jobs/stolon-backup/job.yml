@@ -42,6 +42,5 @@ spec:
           # For sshfs mounts
           securityContext:
             privileged: true
-          args: ["backup"]
       restartPolicy: Never
   backoffLimit: 4

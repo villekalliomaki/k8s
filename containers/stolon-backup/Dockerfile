@@ -17,4 +17,3 @@ RUN mkdir /tmp/backup
 RUN mkdir /mnt/remote
 
 ENTRYPOINT ["bash", "-c", "/entrypoint.sh"]
-CMD ["backup"]
