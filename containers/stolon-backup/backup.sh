@@ -16,9 +16,8 @@ PGPASSWORD="$POSTGRES_PASSWORD" pg_dumpall -U "$POSTGRES_USER" -h "$POSTGRES_HOS
 
 # Create a new backup
 echo "Creating backup of the dump."
-BORG_OUT=$(borg create --stats /mnt/remote::stolon-dumpall-{now} "/tmp/backup/stolon_pg_dumpall.out")
-echo "$BORG_OUT"
-echo "$BORG_OUT" > /tmp/msg
+borg create --stats /mnt/remote::stolon-dumpall-{now} "/tmp/backup/stolon_pg_dumpall.out" > /tmp/msg
+cat /tmp/msg
 
 # Delete temporary file
 rm /tmp/backup/stolon_pg_dumpall.out
