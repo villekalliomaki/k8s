@@ -18,6 +18,7 @@ PGPASSWORD="$POSTGRES_PASSWORD" pg_dumpall -U "$POSTGRES_USER" -h "$POSTGRES_HOS
 echo "Creating backup of the dump."
 BORG_OUT=$(borg create --stats /mnt/remote::stolon-dumpall-{now} "/tmp/backup/stolon_pg_dumpall.out")
 echo "$BORG_OUT"
+echo "$BORG_OUT" > /tmp/msg
 
 # Delete temporary file
 rm /tmp/backup/stolon_pg_dumpall.out
@@ -31,4 +32,4 @@ echo "Unmount /mnt/remote."
 umount /mnt/remote
 
 # Send notification
-/notify.sh "$BORG_OUT"
+/notify.sh
