@@ -1,0 +1,96 @@
+## Cypress
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: minio-cypress
+spec:
+  capacity:
+    storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-minio
+  local:
+    path: /mnt/minio
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - cypress
+---
+## Cypress HDD
+# Requires two minio instances on one k8s node.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: minio-cypress-hdd
+spec:
+  capacity:
+    storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-minio
+  local:
+    path: /mnt/4tb/minio
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - cypress
+---
+## Bluewater
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: minio-bluewater
+spec:
+  capacity:
+    storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-minio
+  local:
+    path: /mnt/minio
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - bluewater
+---
+## Ozarks
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: minio-ozarks
+spec:
+  capacity:
+    storage: 20Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-minio
+  local:
+    path: /mnt/minio
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - ozarks

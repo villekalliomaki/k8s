@@ -1,0 +1,21 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: minio-tls
+spec:
+  secretName: minio-tls
+  duration: 720h # 30 days
+  renewBefore: 72h # 3 days
+  ipAddresses:
+    - 127.0.0.1
+  dnsNames:
+    - minio
+    - minio-0.minio
+    - minio-1.minio
+    - minio-2.minio
+    - minio-3.minio
+  commonName: minio
+  issuerRef:
+    name: root-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
