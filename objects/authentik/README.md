@@ -1,4 +1,4 @@
-# Authentik
+# Authentik (deprecated)
 
 (Site)[https://goauthentik.io/]
 (GitHub)[https://github.com/goauthentik/authentik]

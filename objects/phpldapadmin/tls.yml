@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: phpldapadmin-tls
+spec:
+  secretName: phpldapadmin-tls
+  duration: 720h # 30 days
+  renewBefore: 72h # 3 days
+  ipAddresses:
+    - 127.0.0.1
+  dnsNames:
+    - phpldapadmin
+  commonName: phpldapadmin
+  issuerRef:
+    name: root-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io

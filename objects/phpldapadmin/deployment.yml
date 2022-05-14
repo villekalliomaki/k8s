@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpldapadmin
+  labels:
+    app: phpldapadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpldapadmin
+  template:
+    metadata:
+      labels:
+        app: phpldapadmin
+    spec:
+      containers:
+        - name: phpldapadmin
+          image: osixia/phpldapadmin:0.9.0
+          ports:
+            - containerPort: 443
+              name: https
+              protocol: TCP
+          env:
+            - name: PHPLDAPADMIN_LDAP_HOSTS
+              value: openldap
+            - name: PHPLDAPADMIN_HTTPS_CRT_FILENAME
+              value: tls.crt
+            - name: PHPLDAPADMIN_HTTPS_KEY_FILENAME
+              value: tls.key
+            - name: PHPLDAPADMIN_HTTPS_CA_CRT_FILENAME
+              value: ca.crt
+          volumeMounts:
+            # TLS
+            - mountPath: /container/service/phpldapadmin/assets/apache2/certs
+              name: phpldapadmin-tls
+              readOnly: false
+      volumes:
+        - name: phpldapadmin-tls
+          secret:
+            secretName: phpldapadmin-tls
