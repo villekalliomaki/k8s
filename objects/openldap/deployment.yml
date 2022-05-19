@@ -15,25 +15,28 @@ spec:
     metadata:
       labels:
         app: openldap
-    annotations:
-      vault.hashicorp.com/agent-inject: "true"
-      vault.hashicorp.com/agent-inject-status: "update"
-      vault.hashicorp.com/role: "openldap"
-      vault.hashicorp.com/agent-inject-secret-env: "openldap/data/config"
-      vault.hashicorp.com/agent-inject-template-env: |
-        {{- with secret "openldap/data/config" -}}
-        export LDAP_ORGANISATION={{ .Data.data.organisation }}
-        export LDAP_DOMAIN={{ .Data.data.domain }}
-        export LDAP_ADMIN_PASSWORD={{ .Data.data.adminPassword}}
-        {{- end -}}
-      # Map to where the env file is loaded from
-      vault.hashicorp.com/secret-volume-path: "/container/environment/01-vault"
-      vault.hashicorp.com/tls-skip-verify: "true"
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-status: "update"
+        vault.hashicorp.com/role: "openldap"
+        vault.hashicorp.com/agent-inject-secret-vault.yaml: "openldap/data/config"
+        vault.hashicorp.com/agent-inject-template-vault.yaml: |
+          {{- with secret "openldap/data/config" -}}
+          LDAP_ORGANISATION: {{ .Data.data.organisation }}
+          LDAP_DOMAIN: {{ .Data.data.domain }}
+          LDAP_BASE_DN: {{ .Data.data.root }}
+          LDAP_ADMIN_PASSWORD: {{ .Data.data.adminPassword }}
+
+          {{- end -}}
+        # Map to where the env file is loaded from
+        vault.hashicorp.com/secret-volume-path: "/container/environment/01-vault"
+        vault.hashicorp.com/tls-skip-verify: "true"
     spec:
       serviceAccountName: openldap
       containers:
         - name: openldap
-          image: osixia/openldap:1.5.0
+          image: villekalliomaki/openldap:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 389
               name: ldap
@@ -42,15 +45,28 @@ spec:
               name: ldaps
               protocol: TCP
           env:
-            - name: PHPLDAPADMIN_HTTPS_CRT_FILENAME
+            - name: LDAP_TLS_CRT_FILENAME
               value: tls.crt
-            - name: PHPLDAPADMIN_HTTPS_KEY_FILENAME
+            - name: LDAP_TLS_KEY_FILENAME
               value: tls.key
-            - name: PHPLDAPADMIN_HTTPS_CA_CRT_FILENAME
+            - name: LDAP_TLS_CA_CRT_FILENAME
               value: ca.crt
+            - name: LDAP_TLS_VERIFY_CLIENT
+              value: never
+            - name: DISABLE_CHOWN
+              value: "true"
           volumeMounts:
             # TLS
-            - mountPath: /container/service/phpldapadmin/assets/apache2/certs
+            - mountPath: /container/service/slapd/assets/certs/tls.crt
+              subPath: tls.crt
+              name: openldap-tls
+              readOnly: true
+            - mountPath: /container/service/slapd/assets/certs/tls.key
+              subPath: tls.key
+              name: openldap-tls
+              readOnly: true
+            - mountPath: /container/service/slapd/assets/certs/ca.crt
+              subPath: ca.crt
               name: openldap-tls
               readOnly: true
             # Data
