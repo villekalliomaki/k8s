@@ -36,18 +36,30 @@ spec:
           volumeMounts:
             - mountPath: /data
               name: data
-            - mountPath: /root/.minio/certs
+            - mountPath: /tls
               name: minio-tls
               readOnly: true
           command: ["/bin/bash", "-ec"]
+          env:
+            - name: MINIO_SERVER_URL
+              value: https://minio:9000
           args:
             - |
+              source /vault/secrets/env
               minio server \
               --console-address ":9001" \
-              https://minio-0.minio/data \
-              https://minio-1.minio/data \
-              https://minio-2.minio/data \
-              https://minio-3.minio/data
+              --certs-dir /tls \
+              https://minio-0.minio.default.svc.cluster.local/data \
+              https://minio-1.minio.default.svc.cluster.local/data \
+              https://minio-2.minio.default.svc.cluster.local/data \
+              https://minio-3.minio.default.svc.cluster.local/data
+          resources:
+            limits:
+              memory: 300Mi
+              cpu: 200m
+            requests:
+              memory: 100Mi
+              cpu: 100m
       volumes:
         - name: minio-tls
           secret:
@@ -57,7 +69,7 @@ spec:
               - key: ca.crt
                 path: CAs/ca.crt
               - key: tls.crt
-                path: private.crt
+                path: public.crt
               - key: tls.key
                 path: private.key
   volumeClaimTemplates:

@@ -1,3 +1,6 @@
+# Docs for k8s TLS:
+# https://github.com/minio/minio/tree/master/docs/tls/kubernetes
+# https://github.com/minio/minio/tree/master/docs/tls#3-generate-self-signed-certificates
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -14,6 +17,10 @@ spec:
     - minio-1.minio
     - minio-2.minio
     - minio-3.minio
+    - minio-0.minio.default.svc.cluster.local
+    - minio-1.minio.default.svc.cluster.local
+    - minio-2.minio.default.svc.cluster.local
+    - minio-3.minio.default.svc.cluster.local
   commonName: minio
   issuerRef:
     name: root-ca-issuer
