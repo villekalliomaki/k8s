@@ -5,7 +5,7 @@ metadata:
   labels:
     app: hastebin
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: hastebin
@@ -48,3 +48,10 @@ spec:
               value: "3"
             - name: KEYGENERATOR_TYPE
               value: random
+          resources:
+            limits:
+              memory: 100Mi
+              cpu: 100m
+            requests:
+              memory: 50Mi
+              cpu: 30m

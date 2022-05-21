@@ -160,6 +160,7 @@ spec:
                 - 'n.{{ .Data.data.domain }}'
                 - 'lh.{{ .Data.data.domain }}'
                 - 'd.{{ .Data.data.domain }}'
+                - 'minio.{{ .Data.data.domain }}'
                 policy: two_factor
                 subject:
                   - ["group:admin"]
@@ -257,6 +258,13 @@ spec:
             - mountPath: /mnt/certs
               name: openldap-tls
               readOnly: false
+          resources:
+            limits:
+              memory: 300Mi
+              cpu: 200m
+            requests:
+              memory: 100Mi
+              cpu: 109m
       volumes:
         - name: openldap-tls
           secret:

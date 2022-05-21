@@ -40,6 +40,13 @@ spec:
           volumeMounts:
             - name: flame
               mountPath: /app/data
+          resources:
+            limits:
+              memory: 100Mi
+              cpu: 100m
+            requests:
+              memory: 30Mi
+              cpu: 80m
       volumes:
         - name: flame
           persistentVolumeClaim:
