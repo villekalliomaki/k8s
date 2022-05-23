@@ -161,6 +161,8 @@ spec:
                 - 'lh.{{ .Data.data.domain }}'
                 - 'd.{{ .Data.data.domain }}'
                 - 'minio.{{ .Data.data.domain }}'
+                - 'ldap.{{ .Data.data.domain }}'
+                - 'pihole.{{ .Data.data.domain }}'
                 policy: two_factor
                 subject:
                   - ["group:admin"]
