@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole
+  labels:
+    app: pihole
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole
+  template:
+    metadata:
+      labels:
+        app: pihole
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: cypress
+      hostNetwork: true
+      dnsPolicy: "None"
+      dnsConfig:
+        nameservers:
+          - 1.1.1.1
+      containers:
+        - name: pihole
+          # https://hub.docker.com/r/pihole/pihole/tags
+          image: pihole/pihole:2022.05
+          ports:
+            - name: dns-tcp
+              containerPort: 53
+              protocol: TCP
+            - name: dns-udp
+              containerPort: 53
+              protocol: UDP
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: pihole
+              mountPath: /etc/pihole
+              subPath: pihole
+            - name: pihole
+              mountPath: /etc/dnsmasq.d
+              subPath: dnsmasq
+          env:
+            - name: TZ
+              value: Europe/Helsinki
+      volumes:
+        - name: pihole
+          persistentVolumeClaim:
+            claimName: pihole
