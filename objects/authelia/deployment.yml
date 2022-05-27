@@ -163,6 +163,7 @@ spec:
                 - 'minio.{{ .Data.data.domain }}'
                 - 'ldap.{{ .Data.data.domain }}'
                 - 'pihole.{{ .Data.data.domain }}'
+                - 'kube.{{ .Data.data.domain }}'
                 policy: two_factor
                 subject:
                   - ["group:admin"]
@@ -170,6 +171,7 @@ spec:
               # 1FA login
               - domain:
                 - '{{ .Data.data.domain }}'
+                - 'download.{{ .Data.data.domain }}'
                 policy: one_factor
 
               # Completely public
