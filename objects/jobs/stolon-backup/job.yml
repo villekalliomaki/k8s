@@ -7,6 +7,7 @@ spec:
     metadata:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-pre-populate-only : "true"
         vault.hashicorp.com/role: "stolon"
         vault.hashicorp.com/agent-inject-secret-id_rsa: "ssh/data/general"
         vault.hashicorp.com/agent-inject-template-id_rsa: |
