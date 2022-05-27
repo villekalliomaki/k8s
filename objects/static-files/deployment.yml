@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: static-files
+  labels:
+    app: static-files
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: static-files
+  template:
+    metadata:
+      labels:
+        app: static-files
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: cypress
+      containers:
+        - name: static-files
+          image: halverneus/static-file-server:v1.8.6
+          ports:
+            - containerPort: 80
+              name: http
+          env:
+            - name: PORT
+              value: "80"
+          resources:
+            limits:
+              memory: 50Mi
+              cpu: 100m
+            requests:
+              memory: 20Mi
+              cpu: 50m
+          volumeMounts:
+            - name: media
+              mountPath: /web
+              readOnly: true
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: local-media
