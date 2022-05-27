@@ -1,0 +1,7 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kubernetes-dashboard
+spec:
+  type: ExternalName
+  externalName: kubernetes-dashboard.kubernetes-dashboard.svc.cluster.local
