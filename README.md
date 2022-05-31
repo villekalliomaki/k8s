@@ -27,6 +27,7 @@
 - Uptime Kuma
 - Vaultwarden (Bitwarden)
 - Minio (S3 storage)
+- Gotify
 
 ### Objects
 
