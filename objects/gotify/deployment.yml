@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gotify
+  labels:
+    app: gotify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gotify
+  template:
+    metadata:
+      labels:
+        app: gotify
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-pre-populate-only: "true"
+        vault.hashicorp.com/role: "gotify"
+        vault.hashicorp.com/agent-inject-secret-env: "database/static-creds/gotify"
+        vault.hashicorp.com/agent-inject-template-env: |
+          {{- with secret "database/static-creds/gotify" -}}
+            export GOTIFY_DATABASE_CONNECTION="host=stolon-proxy port=5432 user=gotify dbname=gotify password={{ .Data.password }}"
+          {{- end -}}
+        vault.hashicorp.com/tls-skip-verify: "true"
+    spec:
+      serviceAccount: gotify
+      containers:
+        - name: gotify
+          image: gotify/server-arm64
+          ports:
+            - containerPort: 80
+              name: web
+          env:
+            - name: TZ
+              value: Europe/Helsinki
+            - name: GOTIFY_DATABASE_DIALECT
+              value: postgres
+            - name: GOTIFY_UPLOADEDIMAGESDIR
+              value: /app/data/images
+            - name: GOTIFY_PLUGINSDIR
+              value: /app/data/plugins
+          volumeMounts:
+            - name: gotify
+              mountPath: /app/data
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              source /vault/secrets/env
+              ./gotify-app
+      volumes:
+        - name: gotify
+          persistentVolumeClaim:
+            claimName: gotify
