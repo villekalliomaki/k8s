@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: promtail
+spec:
+  selector:
+    matchLabels:
+      name: promtail
+  template:
+    metadata:
+      labels:
+        name: promtail
+    spec:
+      serviceAccountName: promtail
+      containers:
+        - name: promtail
+          image: grafana/promtail
+          args:
+            - -config.file=/etc/promtail/promtail.yaml
+          env:
+            # Needed when using kubernetes_sd_configs
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: "spec.nodeName"
+          volumeMounts:
+            - name: logs
+              # Path from: https://github.com/grafana/loki/issues/633#issuecomment-514940039
+              mountPath: /var/lib/docker/containers
+            - name: promtail-config
+              mountPath: /etc/promtail
+      volumes:
+        - name: logs
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: promtail-config
+          configMap:
+            name: promtail-config

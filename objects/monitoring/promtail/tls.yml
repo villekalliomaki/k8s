@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: promtail-tls
+spec:
+  secretName: promtail-tls
+  duration: 720h # 30 days
+  renewBefore: 72h # 3 days
+  ipAddresses:
+    - 127.0.0.1
+  dnsNames:
+    - promtail
+  commonName: promtail
+  issuerRef:
+    name: root-ca-issuer
+    kind: ClusterIssuer
+    group: cert-manager.io
