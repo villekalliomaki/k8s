@@ -5,6 +5,10 @@
 - Prometheus for metrics
 - Grafana for displaying
 
+Kubernetes pod logs data flow: Promtail > Loki > Grafana
+
+Other metrics: Prometheus scrapes > Grafana
+
 # Storage
 
 Loki and Prometheus need persistent storage. Both use Longhorn block storage. With stable S3 storage (Minio) setup, loki could migrate to that.

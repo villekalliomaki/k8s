@@ -24,15 +24,26 @@ spec:
                 fieldRef:
                   fieldPath: "spec.nodeName"
           volumeMounts:
+            # Path from: https://github.com/grafana/loki/issues/633#issuecomment-514940039
             - name: logs
-              # Path from: https://github.com/grafana/loki/issues/633#issuecomment-514940039
+              mountPath: /var/log/pods
+            # https://github.com/grafana/loki/issues/429#issuecomment-497244274
+            - name: docker-logs
               mountPath: /var/lib/docker/containers
+            - name: positions
+              mountPath: /var/promtail
             - name: promtail-config
               mountPath: /etc/promtail
       volumes:
         - name: logs
           hostPath:
+            path: /var/log/pods
+        - name: docker-logs
+          hostPath:
             path: /var/lib/docker/containers
+        - name: positions
+          hostPath:
+            path: /var/promtail
         - name: promtail-config
           configMap:
             name: promtail-config

@@ -164,6 +164,7 @@ spec:
                 - 'ldap.{{ .Data.data.domain }}'
                 - 'pihole.{{ .Data.data.domain }}'
                 - 'kube.{{ .Data.data.domain }}'
+                - 'grafana.{{ .Data.data.domain }}'
                 policy: two_factor
                 subject:
                   - ["group:admin"]

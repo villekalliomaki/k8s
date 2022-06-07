@@ -2,12 +2,13 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: promtail
+  namespace: default
 rules:
-  - apiGroups:
-      resources:
-        - nodes
-        - services
-        - pod
+  - apiGroups: [""]
+    resources:
+      - pods
+      - nodes
+      - services
     verbs:
       - get
       - watch
