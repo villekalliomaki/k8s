@@ -1,0 +1,7 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx-ingress-metrics
+spec:
+  type: ExternalName
+  externalName: ingress-nginx-metrics.ingress-nginx.svc.cluster.local

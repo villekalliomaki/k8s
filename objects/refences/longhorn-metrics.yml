@@ -1,0 +1,7 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: longhorn-metrics
+spec:
+  type: ExternalName
+  externalName: longhorn-backend.longhorn-system.svc.cluster.local
