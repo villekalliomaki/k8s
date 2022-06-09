@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: loki-config
+data:
+  local-config.yaml: |
+    auth_enabled: false
+
+    server:
+      http_listen_port: 3100
+
+    ingester:
+      chunk_idle_period: 3m
+      chunk_block_size: 262144
+      chunk_retain_period: 1m
+      max_transfer_retries: 0
+      wal:
+        dir: /loki/wal
+      lifecycler:
+        ring:
+          kvstore:
+            store: inmemory
+          replication_factor: 1 
+
+    table_manager:
+      retention_deletes_enabled: true
+      retention_period: 336h
+
+    limits_config:
+      enforce_metric_name: false
+      reject_old_samples: false
+      reject_old_samples_max_age: 24h
+    schema_config:
+      configs:
+      - from: 2022-06-06
+        store: boltdb-shipper
+        object_store: filesystem
+        schema: v11
+        index:
+          prefix: index_
+          period: 24h
+
+    compactor:
+      working_directory: /tmp/loki/compactor-workdir
+      compaction_interval: 5m
+      shared_store: filesystem
+
+    storage_config:
+      boltdb_shipper:
+        active_index_directory: /loki/boltdb-shipper-active
+        cache_location: /tmp/loki/boltdb-shipper-cache
+        cache_ttl: 24h
+      filesystem:
+        directory: /loki/data

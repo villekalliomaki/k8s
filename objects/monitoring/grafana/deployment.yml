@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  labels:
+    app: grafana
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana-oss
+          ports:
+            - containerPort: 3000
+              name: http
+          volumeMounts:
+            - name: grafana
+              mountPath: /var/lib/grafana
+          securityContext:
+            runAsGroup: 0
+            runAsNonRoot: false
+            runAsUser: 0
+      volumes:
+        - name: grafana
+          persistentVolumeClaim:
+            claimName: grafana
