@@ -6,7 +6,7 @@
 - Hashicorp Vault
 - KeyDB (Redis)
 - Stolon (PostgreSQL)
-- [Flame](https://github.com/pawelmalak/flame)
+- Flame
 - Wireguard
   - Node to node
   - Remotely to cluster
@@ -14,7 +14,7 @@
   - Authelia SSO
   - OpenLDAP
   - phpLDAPadmin
-- [Trilium](https://github.com/zadam/trilium)
+- Trilium
 - Media
   - Jellyfin
   - Transmission
@@ -24,10 +24,15 @@
   - Bazarr
 - Hastebin
 - Trilium notes
-- Uptime Kuma
 - Vaultwarden (Bitwarden)
 - Minio (S3 storage)
 - Gotify
+- Monitoring
+  - Promtail
+  - Prometheus
+  - Loki
+  - Grafana
+  - Node exporter
 
 ### Objects
 

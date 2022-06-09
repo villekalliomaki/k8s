@@ -173,7 +173,6 @@ spec:
               - domain:
                 - '{{ .Data.data.domain }}'
                 - 'download.{{ .Data.data.domain }}'
-                - 'vault.{{ .Data.data.domain }}'
                 policy: one_factor
 
               # Completely public
