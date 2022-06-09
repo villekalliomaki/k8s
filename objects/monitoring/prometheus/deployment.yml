@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  labels:
+    app: prometheus
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.36.1
+          ports:
+            - containerPort: 9090
+              name: http
+          volumeMounts:
+            - name: prometheus
+              mountPath: /prometheus
+            - name: prometheus-config
+              mountPath: /etc/prometheus
+          # Run with user nobody
+          securityContext:
+            runAsGroup: 65534
+            runAsNonRoot: false
+            runAsUser: 65534
+      initContainers:
+        - name: init-prometheus
+          image: busybox:1.28
+          command: ["sh", "-c", "chown 65534:65534 /prometheus"]
+          volumeMounts:
+            - name: prometheus
+              mountPath: /prometheus
+      volumes:
+        - name: prometheus
+          persistentVolumeClaim:
+            claimName: prometheus
+        - name: prometheus-config
+          configMap:
+            name: prometheus-config
