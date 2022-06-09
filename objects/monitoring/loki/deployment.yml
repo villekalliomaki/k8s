@@ -25,6 +25,8 @@ spec:
           volumeMounts:
             - name: loki
               mountPath: /loki
+            - name: loki-config
+              mountPath: /etc/loki
           securityContext:
             runAsGroup: 0
             runAsNonRoot: false
@@ -33,3 +35,6 @@ spec:
         - name: loki
           persistentVolumeClaim:
             claimName: loki
+        - name: loki-config
+          configMap:
+            name: loki-config
