@@ -31,4 +31,10 @@ data:
         target_label: '__host__'
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
-        target_label: instance
+        target_label: pod
+      - source_labels: ['__meta_kubernetes_pod_controller_name']
+        action: replace
+        target_label: controller
+      - source_labels: ['__meta_kubernetes_pod_label_app']
+        action: replace
+        target_label: app
