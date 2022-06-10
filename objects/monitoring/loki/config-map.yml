@@ -8,6 +8,13 @@ data:
 
     server:
       http_listen_port: 3100
+    
+    frontend:
+      max_outstanding_per_tenant: 4096
+
+    query_range:
+      # https://github.com/grafana/loki/issues/4613#issuecomment-1018062936
+      parallelise_shardable_queries: false
 
     ingester:
       chunk_idle_period: 3m
