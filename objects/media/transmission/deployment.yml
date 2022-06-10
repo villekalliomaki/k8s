@@ -18,7 +18,8 @@ spec:
     spec:
       containers:
         - name: transmission
-          image: linuxserver/transmission:3.00-r5-ls121
+          # https://hub.docker.com/r/linuxserver/transmission/tags
+          image: linuxserver/transmission:3.00-r5-ls125
           ports:
             # Web UI
             - containerPort: 9091

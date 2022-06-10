@@ -18,6 +18,7 @@ spec:
     spec:
       containers:
         - name: bazarr
+          # https://hub.docker.com/r/linuxserver/bazarr/tags
           image: linuxserver/bazarr:1.0.4
           ports:
             # Web

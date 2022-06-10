@@ -18,6 +18,7 @@ spec:
     spec:
       containers:
         - name: sonarr
+          # https://hub.docker.com/r/linuxserver/sonarr/tags
           image: linuxserver/sonarr:version-3.0.8.1507
           ports:
             # Web

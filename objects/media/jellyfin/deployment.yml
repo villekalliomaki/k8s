@@ -18,6 +18,7 @@ spec:
     spec:
       containers:
         - name: jellyfin
+          # https://hub.docker.com/r/linuxserver/jellyfin/tags
           image: linuxserver/jellyfin:10.7.7
           ports:
             # Web

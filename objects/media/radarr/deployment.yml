@@ -18,7 +18,8 @@ spec:
     spec:
       containers:
         - name: radarr
-          image: linuxserver/radarr:4.1.0.6175-ls136
+          # https://hub.docker.com/r/linuxserver/radarr/tags
+          image: linuxserver/radarr:version-4.1.0.6175
           ports:
             # Web
             - containerPort: 7878
