@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etesync
+  labels:
+    app: etesync
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: etesync
+  template:
+    metadata:
+      labels:
+        app: etesync
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "etesync"
+        vault.hashicorp.com/agent-inject-secret-env: "etesync/data/config"
+        vault.hashicorp.com/agent-inject-template-env: |
+          {{ with secret "database/static-creds/etesync" }}
+          export DATABASE_PASSWORD={{ .Data.password }}
+          {{ end }}
+
+          {{ with secret "etesync/data/config" }}
+          export SUPER_USER={{ .Data.data.superUser }}
+          export SUPER_PASS={{ .Data.data.superUserPassword }}
+          export SUPER_EMAIL={{ .Data.data.superUserEmail }}
+          export ALLOWED_HOSTS={{ .Data.data.allowedHosts }}
+          export SECRET_KEY={{ .Data.data.secretKey }}
+          {{ end }}
+        vault.hashicorp.com/tls-skip-verify: "true"
+    spec:
+      serviceAccountName: etesync
+      containers:
+        - name: etesync
+          # https://hub.docker.com/r/victorrds/etesync/tags
+          # https://github.com/victor-rds/docker-etebase
+          image: victorrds/etesync:0.9.1-alpine
+          ports:
+            - containerPort: 3735
+              protocol: TCP
+              name: http
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              source /vault/secrets/env
+              /entrypoint.sh
+          env:
+            - name: SERVER
+              value: uvicorn
+            - name: DATABASE_HOST
+              value: stolon-proxy
+            - name: DATABASE_NAME
+              value: etesync
+            - name: DB_ENGINE
+              value: postgres
+          volumeMounts:
+            - name: etesync
+              mountPath: /data
+          resources:
+            limits:
+              memory: 100Mi
+              cpu: 100m
+            requests:
+              memory: 50Mi
+              cpu: 30m
+      initContainers:
+        - name: init-permissions
+          image: busybox:1.28
+          command: ["sh", "-c", "chown 373:373 /data"]
+          volumeMounts:
+            - name: etesync
+              mountPath: /data
+      volumes:
+        - name: etesync
+          persistentVolumeClaim:
+            claimName: etesync

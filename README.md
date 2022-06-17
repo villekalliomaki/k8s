@@ -33,6 +33,10 @@
   - Loki
   - Grafana
   - Node exporter
+- Calendar
+  - Etebase server
+  - Etebase WebDAV proxy
+  - Etebase web UI
 
 ### Objects
 
