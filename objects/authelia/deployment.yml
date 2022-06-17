@@ -104,7 +104,8 @@ spec:
               username_attribute: cn
               additional_users_dn: ou=users
               users_filter: (&({username_attribute}={input})(objectClass=person))
-              groups_filter: (&(member={dn})(objectClass=groupOfNames))
+              # https://github.com/authelia/authelia/issues/1517#issuecomment-745572033
+              groups_filter: (&(uniquemember={dn})(objectclass=groupOfUniqueNames))
 
               ## The attribute holding the name of the group.
               # group_name_attribute: cn
