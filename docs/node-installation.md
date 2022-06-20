@@ -44,6 +44,9 @@ sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io doc
 
 # test installation
 docker run hello-world
+
+# common folders
+sudo mkdir -p /mnt/{hashicorp-vault,keydb,minio,stolon}
 ```
 
 ## Install wireguard (optional, remote nodes)
@@ -84,12 +87,21 @@ Enable wireguard interface.
 sudo systemctl enable --now wg-quick@k8s
 ```
 
+## Install Longhorn dependencies
+
+Longhorn distributed block storage.
+
+- [Installation guide (1.2.4)](https://longhorn.io/docs/1.2.4/deploy/install/)
+
+```sh
+apt-get install nfs-common open-iscsi -y
+```
+
 ## Install kubeadm
 
 Useful docs:
 - [Required ports](https://kubernetes.io/docs/reference/ports-and-protocols/)
 - [Install kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
-- []()
 
 Install `kubeadm`, `kubelet` and `kubectl`.
 
@@ -108,9 +120,8 @@ sudo apt-get update && sudo apt-get install -y kubelet kubeadm kubectl && sudo a
 sudo apt-get update && sudo apt-get install -y kubelet=1.23.1-00 kubeadm=1.23.1-00 kubectl=1.23.1-00 && sudo apt-mark hold kubelet kubeadm kubectl
 ```
 
-Get the join command. Nodes must be able to reach each other now. Run on a control plane.
+Get the join command. Nodes must be able to reach each other now. Run on a control plane. Add `--dry-run` to the printed join command to run pre-flight checks before joining.
 
 ```sh
 kubeadm token create --print-join-command
 ```
-
