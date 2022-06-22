@@ -1,0 +1,47 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hashicorp-vault-backup
+spec:
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-pre-populate-only : "true"
+        vault.hashicorp.com/role: "stolon"
+        vault.hashicorp.com/agent-inject-secret-id_rsa: "ssh/data/general"
+        vault.hashicorp.com/agent-inject-template-id_rsa: |
+          {{- with secret "ssh/data/general" -}}
+          {{ .Data.data.key }}
+          {{- end -}}
+        vault.hashicorp.com/agent-inject-secret-env: "stolon/data"
+        vault.hashicorp.com/agent-inject-template-env: |
+          {{- with secret "stolon/data/config" -}}
+          export POSTGRES_PASSWORD={{ .Data.data.superuserPassword }}
+          export POSTGRES_USER=stolon
+          export POSTGRES_HOST=stolon-proxy \n
+          {{- end -}}
+
+          {{- with secret "stolon/data/backup" -}}
+          export REMOTE_USER={{ .Data.data.remoteUser }}
+          export REMOTE_HOST={{ .Data.data.remoteHost }}
+          export REMOTE_PATH={{ .Data.data.remotePath }}
+          export BORG_PASSPHRASE={{ .Data.data.borgPassphrase }} \n
+          {{- end -}}
+
+          {{- with secret "gotify/data/general" -}}
+          export GOTIFY_TOKEN="{{ .Data.data.token }}"
+          export GOTIFY_ENDPOINT="{{ .Data.data.endpoint }}" \n
+          {{- end -}}
+        vault.hashicorp.com/tls-skip-verify: "true"
+    spec:
+      serviceAccountName: stolon
+      containers:
+        - name: backup
+          image: villekalliomaki/hashicorp-vault-backup:latest
+          imagePullPolicy: Always
+          # For sshfs mounts
+          securityContext:
+            privileged: true
+      restartPolicy: Never
+  backoffLimit: 4
