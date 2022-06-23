@@ -13,14 +13,14 @@ spec:
     - 127.0.0.1
   dnsNames:
     - minio
-    - minio-0.minio
-    - minio-1.minio
-    - minio-2.minio
-    - minio-3.minio
-    - minio-0.minio.default.svc.cluster.local
-    - minio-1.minio.default.svc.cluster.local
-    - minio-2.minio.default.svc.cluster.local
-    - minio-3.minio.default.svc.cluster.local
+    - minio-1disk-0.minio
+    - minio-1disk-1.minio
+    - minio-2disk-0.minio
+    - minio-2disk-0.minio
+    - minio-1disk-0.minio.default.svc.cluster.local
+    - minio-1disk-1.minio.default.svc.cluster.local
+    - minio-2disk-0.minio.default.svc.cluster.local
+    - minio-2disk-0.minio.default.svc.cluster.local
   commonName: minio
   issuerRef:
     name: root-ca-issuer

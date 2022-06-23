@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: minio
+  name: minio-2disk
 spec:
   serviceName: minio
-  replicas: 4
+  replicas: 1
   selector:
     matchLabels:
       app: minio
@@ -29,13 +29,17 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: minio
-          image: minio/minio:RELEASE.2022-05-08T23-50-31Z
+          # https://hub.docker.com/r/minio/minio/tags
+          # 1 and 2 disk objects must be in sync
+          image: minio/minio:RELEASE.2022-06-11T19-55-32Z
           ports:
             - containerPort: 9000
             - containerPort: 9001
           volumeMounts:
-            - mountPath: /data
-              name: data
+            - mountPath: /data1
+              name: data1
+            - mountPath: /data2
+              name: data2
             - mountPath: /tls
               name: minio-tls
               readOnly: true
@@ -49,10 +53,10 @@ spec:
               minio server \
               --console-address ":9001" \
               --certs-dir /tls \
-              https://minio-0.minio.default.svc.cluster.local/data \
-              https://minio-1.minio.default.svc.cluster.local/data \
-              https://minio-2.minio.default.svc.cluster.local/data \
-              https://minio-3.minio.default.svc.cluster.local/data
+              https://minio-1disk-0.minio.default.svc.cluster.local/data1 \
+              https://minio-1disk-1.minio.default.svc.cluster.local/data1 \
+              https://minio-2disk-0.minio.default.svc.cluster.local/data1 \
+              https://minio-2disk-0.minio.default.svc.cluster.local/data2
           resources:
             limits:
               memory: 300Mi
@@ -74,7 +78,15 @@ spec:
                 path: private.key
   volumeClaimTemplates:
     - metadata:
-        name: data
+        name: data1
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: local-minio
+        resources:
+          requests:
+            storage: 20Gi
+    - metadata:
+        name: data2
       spec:
         accessModes: ["ReadWriteOnce"]
         storageClassName: local-minio
