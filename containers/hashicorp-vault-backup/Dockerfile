@@ -5,7 +5,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # Runtime envuironment
 ENV ENV_FILE=/vault/secrets/env
-ENV GOTIFY_ENDPOINT=http://gotify
 ENV VAULT_ADDR=https://hashicorp-vault-active
 ENV CA_CERT_DIR=/mnt/certs
 

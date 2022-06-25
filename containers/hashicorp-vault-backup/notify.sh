@@ -9,5 +9,5 @@ else
     curl -X POST "$GOTIFY_ENDPOINT/message?token=$GOTIFY_TOKEN" \
     -F "title=Hashicorp Vault backup" \
     -F "message=A new backup created at $(date)" \
-    -F "priority=5"
+    -F "priority=6"
 fi

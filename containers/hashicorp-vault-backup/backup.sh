@@ -7,7 +7,41 @@ source log.sh
 
 logline "Starting backup"
 
-# 
+# Get secrets
+source "$ENV_FILE"
+
+# Mount the remote backup directory
+echo "Mounting $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH at /mnt/remote."
+sshfs -o StrictHostKeyChecking=no -p 23 "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH" /mnt/remote
+
+# Get the token
+SERIVCE_ACCOUNT_TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+
+# Create a new vault token
+export VAULT_TOKEN=$(vault write -field=token auth/kubernetes/login jwt=$SERIVCE_ACCOUNT_TOKEN role=backup);
 
 # Create the snapshot file
+logline "Creating a new snapshot '/tmp/backup/backup-raft-snapshot'"
 vault operator raft snapshot save /tmp/backup/backup-raft-snapshot
+
+# Create a new backup
+logline "Creating a new backup"
+borg create --stats /mnt/remote::hashicorp-vault-raft-snapshot-{now} "/tmp/backup/backup-raft-snapshot"
+
+# Delete temp snapshot
+rm /tmp/backup/backup-raft-snapshot
+
+# Prune repo, backup runs once a day
+# Keep:
+#   daily: 30
+#   weekly: 16
+#   monthly: 24
+logline "Pruning backups"
+borgbackup prune -v --keep-daily=30 --keep-weekly=16 --keep-monthly=24 /mnt/remote
+
+# Unmount remote host
+logline "Unmount /mnt/remote."
+umount /mnt/remote
+
+# Send notification
+/notify.sh
