@@ -3,6 +3,7 @@ kind: Job
 metadata:
   name: hashicorp-vault-backup
 spec:
+  backoffLimit: 4
   template:
     metadata:
       annotations:
@@ -37,5 +38,15 @@ spec:
           # For sshfs mounts
           securityContext:
             privileged: true
+          volumeMounts:
+            - name: hashicorp-vault-tls
+              mountPath: /mnt/certs
+              readOnly: true
       restartPolicy: Never
-  backoffLimit: 4
+      volumes:
+        - name: hashicorp-vault-tls
+          secret:
+            secretName: hashicorp-vault-tls
+            items:
+              - key: ca.crt
+                path: ca.crt

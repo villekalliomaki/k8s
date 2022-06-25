@@ -7,7 +7,7 @@ logline "Started container"
 
 # Import TLS certs for the vault client
 logline "Importing certs"
-cp /mnt/certs/. /usr/local/share/ca-certificates
+cp /mnt/certs/* /usr/local/share/ca-certificates
 update-ca-certificates
 
 # Copy SSH private key, for the remote host
