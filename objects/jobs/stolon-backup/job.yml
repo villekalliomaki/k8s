@@ -29,7 +29,7 @@ spec:
           export BORG_PASSPHRASE={{ .Data.data.borgPassphrase }} \n
           {{- end -}}
 
-          {{- with secret "gotify/data/general" -}}
+          {{- with secret "gotify/data/stolon" -}}
           export GOTIFY_TOKEN="{{ .Data.data.token }}"
           export GOTIFY_ENDPOINT="{{ .Data.data.endpoint }}" \n
           {{- end -}}
