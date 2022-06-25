@@ -8,7 +8,7 @@ spec:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-pre-populate-only: "true"
-        vault.hashicorp.com/role: "snapshot"
+        vault.hashicorp.com/role: "backup"
         vault.hashicorp.com/agent-inject-secret-id_rsa: "ssh/data/general"
         vault.hashicorp.com/agent-inject-template-id_rsa: |
           {{- with secret "ssh/data/general" -}}
@@ -23,13 +23,13 @@ spec:
           export BORG_PASSPHRASE={{ .Data.data.borgPassphrase }} \n
           {{- end -}}
 
-          {{- with secret "gotify/data/general" -}}
+          {{- with secret "gotify/data/hashicorp-vault" -}}
           export GOTIFY_TOKEN="{{ .Data.data.token }}"
           export GOTIFY_ENDPOINT="{{ .Data.data.endpoint }}" \n
           {{- end -}}
         vault.hashicorp.com/tls-skip-verify: "true"
     spec:
-      serviceAccountName: snapshot
+      serviceAccountName: backup
       containers:
         - name: backup
           image: villekalliomaki/hashicorp-vault-backup:latest
