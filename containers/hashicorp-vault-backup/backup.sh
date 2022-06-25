@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 source log.sh
 
 # Backup of the integrated storage
@@ -12,7 +13,7 @@ source "$ENV_FILE"
 
 # Mount the remote backup directory
 echo "Mounting $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH at /mnt/remote."
-sshfs -o StrictHostKeyChecking=no -p 23 "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH" /mnt/remote
+sshfs -o StrictHostKeyChecking=no -p 23 "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH" /tmp/remote
 
 # Get the token
 SERIVCE_ACCOUNT_TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
@@ -26,7 +27,7 @@ vault operator raft snapshot save /tmp/backup/backup-raft-snapshot
 
 # Create a new backup
 logline "Creating a new backup"
-borg create --stats /mnt/remote::hashicorp-vault-raft-snapshot-{now} "/tmp/backup/backup-raft-snapshot"
+borg create --stats /tmp/remote::hashicorp-vault-raft-snapshot-{now} "/tmp/backup/backup-raft-snapshot"
 
 # Delete temp snapshot
 rm /tmp/backup/backup-raft-snapshot
