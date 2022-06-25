@@ -12,7 +12,7 @@ logline "Starting backup"
 source "$ENV_FILE"
 
 # Mount the remote backup directory
-echo "Mounting $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH at /mnt/remote."
+logline "Mounting $REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH at /tmp/remote."
 sshfs -o StrictHostKeyChecking=no -p 23 "$REMOTE_USER@$REMOTE_HOST:$REMOTE_PATH" /tmp/remote
 
 # Get the token
