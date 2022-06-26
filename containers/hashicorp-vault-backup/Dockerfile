@@ -5,7 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # Runtime envuironment
 ENV ENV_FILE=/vault/secrets/env
-ENV VAULT_ADDR=https://hashicorp-vault-active
+ENV VAULT_ADDR=https://hashicorp-vault-active:8200
 ENV CA_CERT_DIR=/mnt/certs
 
 # Install other packages

@@ -38,11 +38,11 @@ rm /tmp/backup/backup-raft-snapshot
 #   weekly: 16
 #   monthly: 24
 logline "Pruning backups"
-borgbackup prune -v --keep-daily=30 --keep-weekly=16 --keep-monthly=24 /mnt/remote
+borgbackup prune -v --keep-daily=30 --keep-weekly=16 --keep-monthly=24 /tmp/remote
 
 # Unmount remote host
-logline "Unmount /mnt/remote."
-umount /mnt/remote
+logline "Unmount /tmp/remote."
+umount /tmp/remote
 
 # Send notification
 /notify.sh
