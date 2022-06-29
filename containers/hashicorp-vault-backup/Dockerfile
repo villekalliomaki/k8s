@@ -23,9 +23,6 @@ RUN apt-get install gpg -y \
 # Test the installation
 RUN vault version
 
-# Create temporary directories
-RUN mkdir -p /mnt/{backup,remote}
-
 # Copy scripts
 COPY . .
 

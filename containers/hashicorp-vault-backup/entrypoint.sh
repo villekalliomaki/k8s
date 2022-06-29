@@ -17,4 +17,8 @@ chmod 700 ~/.ssh
 cp /vault/secrets/id_rsa ~/.ssh/
 chmod 600 ~/.ssh/id_rsa
 
+# Create directories
+logline "Create backup and remote directories"
+mkdir -p /mnt/{backup,remote}
+
 /backup.sh
