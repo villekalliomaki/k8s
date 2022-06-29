@@ -1,10 +1,10 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: stolon-backup
+  name: hashicorp-vault-backup
 spec:
-  # Run daily at 5:00
-  schedule: "0 5 * * *"
+  # Run daily at 6:30
+  schedule: "30 6 * * *"
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 2
   jobTemplate:
@@ -14,40 +14,45 @@ spec:
         metadata:
           annotations:
             vault.hashicorp.com/agent-inject: "true"
-            vault.hashicorp.com/agent-pre-populate-only : "true"
-            vault.hashicorp.com/role: "stolon"
+            vault.hashicorp.com/agent-pre-populate-only: "true"
+            vault.hashicorp.com/role: "backup"
             vault.hashicorp.com/agent-inject-secret-id_rsa: "ssh/data/general"
             vault.hashicorp.com/agent-inject-template-id_rsa: |
               {{- with secret "ssh/data/general" -}}
               {{ .Data.data.key }}
               {{- end -}}
-            vault.hashicorp.com/agent-inject-secret-env: "stolon/data"
+            vault.hashicorp.com/agent-inject-secret-env: "cluster/data/backup/hashicorp-vault"
             vault.hashicorp.com/agent-inject-template-env: |
-              {{- with secret "stolon/data/config" -}}
-              export POSTGRES_PASSWORD={{ .Data.data.superuserPassword }}
-              export POSTGRES_USER=stolon
-              export POSTGRES_HOST=stolon-proxy \n
-              {{- end -}}
-
-              {{- with secret "stolon/data/backup" -}}
+              {{- with secret "cluster/data/backup/hashicorp-vault" -}}
               export REMOTE_USER={{ .Data.data.remoteUser }}
               export REMOTE_HOST={{ .Data.data.remoteHost }}
               export REMOTE_PATH={{ .Data.data.remotePath }}
               export BORG_PASSPHRASE={{ .Data.data.borgPassphrase }} \n
               {{- end -}}
 
-              {{- with secret "gotify/data/stolon" -}}
+              {{- with secret "gotify/data/hashicorp-vault" -}}
               export GOTIFY_TOKEN="{{ .Data.data.token }}"
               export GOTIFY_ENDPOINT="{{ .Data.data.endpoint }}" \n
               {{- end -}}
             vault.hashicorp.com/tls-skip-verify: "true"
         spec:
-          serviceAccountName: stolon
+          serviceAccountName: backup
           containers:
             - name: backup
-              image: villekalliomaki/stolon-backup:latest
+              image: villekalliomaki/hashicorp-vault-backup:latest
               imagePullPolicy: Always
               # For sshfs mounts
               securityContext:
                 privileged: true
+              volumeMounts:
+                - name: hashicorp-vault-tls
+                  mountPath: /mnt/certs
+                  readOnly: true
           restartPolicy: Never
+          volumes:
+            - name: hashicorp-vault-tls
+              secret:
+                secretName: hashicorp-vault-tls
+                items:
+                  - key: ca.crt
+                    path: ca.crt
