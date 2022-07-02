@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radicale
+  labels:
+    app: radicale
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: radicale
+  template:
+    metadata:
+      labels:
+        app: radicale
+    spec:
+      containers:
+        - name: radicale
+          # https://hub.docker.com/r/tomsquest/docker-radicale/tags
+          image: tomsquest/docker-radicale:3.1.7.0
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: 5232
+          volumeMounts:
+            - name: radicale
+              mountPath: /data
+          livenessProbe:
+            exec:
+              command: ["curl --fail http://localhost:5232 || exit 1"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: radicale
+          persistentVolumeClaim:
+            claimName: radicale
