@@ -186,7 +186,8 @@ spec:
                 # Note: Admin API is not public
                 - 'vault.{{ .Data.data.domain }}'
                 - 'l.{{ .Data.data.domain }}'
-                - 'etesync.{{ .Data.data.domain }}'
+                - 'cal.{{ .Data.data.domain }}'
+                - 'up.{{ .Data.data.domain }}'
                 policy: bypass
           {{ end }}
 
