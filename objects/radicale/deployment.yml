@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radicale
+  labels:
+    app: radicale
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: radicale
+  template:
+    metadata:
+      labels:
+        app: radicale
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-status: "update"
+        vault.hashicorp.com/role: "radicale"
+        vault.hashicorp.com/agent-inject-secret-users: "radicale/data/config"
+        vault.hashicorp.com/agent-inject-template-users: |
+          {{- with secret "radicale/data/config" -}}
+          {{ .Data.data.user }}:{{ .Data.data.password }}
+          {{- end -}}
+        vault.hashicorp.com/tls-skip-verify: "true"
+    spec:
+      serviceAccountName: radicale
+      containers:
+        - name: radicale
+          # https://hub.docker.com/r/tomsquest/docker-radicale/tags
+          image: tomsquest/docker-radicale:3.1.7.0
+          ports:
+            - name: http
+              protocol: TCP
+              containerPort: 5232
+          volumeMounts:
+            - name: radicale
+              mountPath: /data
+            - name: radicale-config
+              mountPath: /config
+      volumes:
+        - name: radicale
+          persistentVolumeClaim:
+            claimName: radicale
+        - name: radicale-config
+          configMap:
+            name: radicale-config
+            items:
+              - key: config
+                path: config

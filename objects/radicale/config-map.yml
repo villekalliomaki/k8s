@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: radicale-config
+data:
+  config: |
+    [server]
+    hosts = 0.0.0.0:5232
+    max_connections = 20
+    max_content_length = 100000000
+    timeout = 30
+
+    [auth]
+    delay = 10
+    type = htpasswd
+    htpasswd_filename = /vault/secrets/users
+    htpasswd_encryption = plain
+
+    [storage]
+    filesystem_folder = /data/collections
