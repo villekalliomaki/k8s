@@ -19,7 +19,7 @@ spec:
       containers:
         - name: uptime-kuma-server
           # https://hub.docker.com/r/louislam/uptime-kuma/tags
-          image: louislam/uptime-kuma:1.15.1
+          image: louislam/uptime-kuma:1.17.1
           env:
             - name: UPTIME_KUMA_PORT
               value: "80"
@@ -29,11 +29,6 @@ spec:
           volumeMounts:
             - name: storage
               mountPath: /app/data
-          livenessProbe:
-            exec:
-              command:
-                - node
-                - extra/healthcheck.js
       volumes:
         - name: storage
           persistentVolumeClaim:
