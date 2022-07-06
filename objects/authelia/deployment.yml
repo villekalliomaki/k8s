@@ -260,7 +260,7 @@ spec:
         - name: authelia
           # https://hub.docker.com/r/authelia/authelia/tags
           # https://github.com/authelia/authelia/releases
-          image: authelia/authelia:4.35.6
+          image: authelia/authelia:4.36.2
           ports:
             - containerPort: 80
               name: http

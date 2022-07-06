@@ -18,6 +18,7 @@ spec:
         kubernetes.io/hostname: cypress
       containers:
         - name: static-files
+          # https://hub.docker.com/r/halverneus/static-file-server/tags
           image: halverneus/static-file-server:v1.8.6
           ports:
             - containerPort: 80

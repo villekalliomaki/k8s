@@ -29,6 +29,7 @@ spec:
       serviceAccountName: flame
       containers:
         - name: flame
+          # https://hub.docker.com/r/pawelmalak/flame/tags
           image: pawelmalak/flame:multiarch2.3.0
           ports:
             - containerPort: 5005

@@ -27,7 +27,8 @@ spec:
       serviceAccount: gotify
       containers:
         - name: gotify
-          image: gotify/server-arm64
+          # https://hub.docker.com/r/gotify/server-arm64/tags
+          image: gotify/server-arm64:2.1.4
           ports:
             - containerPort: 80
               name: web

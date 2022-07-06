@@ -19,7 +19,7 @@ spec:
       containers:
         - name: jackett
           # https://hub.docker.com/r/linuxserver/jackett/tags
-          image: linuxserver/jackett:version-v0.20.1158
+          image: linuxserver/jackett:0.20.1285
           ports:
             # Web
             - containerPort: 9117

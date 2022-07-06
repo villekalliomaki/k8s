@@ -40,6 +40,7 @@ spec:
       serviceAccountName: paperless
       containers:
         - name: paperless
+          # https://hub.docker.com/r/jonaswinkler/paperless-ng/tags
           image: jonaswinkler/paperless-ng:1.5.0
           ports:
             - containerPort: 8000
