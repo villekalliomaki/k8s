@@ -22,6 +22,7 @@ spec:
           {{- with secret "minio/config" -}}
             export MINIO_ROOT_USER={{ .Data.data.username }}
             export MINIO_ROOT_PASSWORD={{ .Data.data.password }}
+            export MINIO_SERVER_URL={{ .Data.data.serverUrl }}
           {{- end -}}
         vault.hashicorp.com/tls-skip-verify: "true"
     spec:
@@ -31,7 +32,7 @@ spec:
         - name: minio
           # https://hub.docker.com/r/minio/minio/tags
           # 1 and 2 disk objects must be in sync
-          image: minio/minio:RELEASE.2022-06-11T19-55-32Z
+          image: minio/minio:RELEASE.2022-07-08T00-05-23Z
           ports:
             - containerPort: 9000
             - containerPort: 9001
@@ -44,9 +45,6 @@ spec:
               name: minio-tls
               readOnly: true
           command: ["/bin/bash", "-ec"]
-          env:
-            - name: MINIO_SERVER_URL
-              value: https://minio:9000
           args:
             - |
               source /vault/secrets/env
