@@ -27,7 +27,7 @@ spec:
           {{ with secret "authelia/data/config" }}
           jwt_secret: {{ .Data.data.jwtSecret }}
           default_redirection_url: https://{{ .Data.data.domain }}/
-          default_2fa_method: ""
+          default_2fa_method: "totp"
           {{ end }}
 
 
@@ -60,7 +60,7 @@ spec:
 
           totp:
             disable: false
-            issuer: sso.{{ with secret "authelia/data/config" }}{{ .Data.data.domain }}{{ end }}
+            issuer: {{ with secret "authelia/data/config" }}{{ .Data.data.domain }}{{ end }}
             algorithm: sha1
             digits: 6
             period: 30
@@ -194,12 +194,12 @@ spec:
           {{ end }}
 
           session:
-            name: sso_session
+            name: authelia_sso_session
             domain: {{ with secret "authelia/data/config" }}{{ .Data.data.domain }}{{ end }}
             same_site: lax
             secret: {{ with secret "authelia/data/config" }}{{ .Data.data.sessionSecret }}{{ end }}
             expiration: 1h
-            inactivity: 5m
+            inactivity: 15m
             remember_me_duration: 1M
 
             redis:
@@ -207,14 +207,14 @@ spec:
               port: 6379
               password: {{ with secret "keydb/data/config" }}{{ .Data.data.password }}{{ end }}
 
-              database_index: 0
+              database_index: 7
               maximum_active_connections: 8
               minimum_idle_connections: 0
 
           regulation:
-            max_retries: 3
-            find_time: 2m
-            ban_time: 15m
+            max_retries: 5
+            find_time: 5m
+            ban_time: 1h
 
           storage:
             encryption_key: {{ with secret "authelia/data/config" }}{{ .Data.data.encryptionKey }}{{ end }}
@@ -262,7 +262,7 @@ spec:
         - name: authelia
           # https://hub.docker.com/r/authelia/authelia/tags
           # https://github.com/authelia/authelia/releases
-          image: authelia/authelia:4.36.2
+          image: authelia/authelia:4.36.1
           ports:
             - containerPort: 80
               name: http
