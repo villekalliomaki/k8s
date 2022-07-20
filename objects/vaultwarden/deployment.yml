@@ -32,8 +32,7 @@ spec:
           {{- with secret "email/data/system" -}}
           export SMTP_HOST={{ .Data.data.host }}
           export SMTP_PORT=465
-          export SMTP_SSL=true
-          export SMTP_EXPLICIT_TLS=false
+          export SMTP_SECURITY=starttls
           export SMTP_FROM="{{ .Data.data.from }}"
           export SMTP_USERNAME={{ .Data.data.username }}
           export SMTP_PASSWORD={{ .Data.data.password }}
@@ -67,3 +66,12 @@ spec:
             # Login and registeration
             - name: SIGNUPS_ALLOWED
               value: "false"
+          # Added because:
+          # Add a persistent volume check, in #2501, #2507
+          volumeMounts:
+            - name: vaultwarden
+              mountPath: /data
+      volumes:
+        - name: vaultwarden
+          persistentVolumeClaim:
+            claimName: vaultwarden
