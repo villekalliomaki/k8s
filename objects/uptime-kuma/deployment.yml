@@ -33,3 +33,6 @@ spec:
         - name: storage
           persistentVolumeClaim:
             claimName: uptime-kuma
+      # Run on master node since from it the traffic is most reliable
+      nodeSelector:
+        kubernetes.io/hostname: cypress
