@@ -54,7 +54,7 @@ spec:
       containers:
         - name: vaultwarden
           # https://hub.docker.com/r/vaultwarden/server/tags
-          image: vaultwarden/server:1.25.0
+          image: vaultwarden/server:1.25.1
           ports:
             - containerPort: 80
               name: http

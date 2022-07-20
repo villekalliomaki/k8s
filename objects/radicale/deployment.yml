@@ -30,7 +30,7 @@ spec:
       containers:
         - name: radicale
           # https://hub.docker.com/r/tomsquest/docker-radicale/tags
-          image: tomsquest/docker-radicale:3.1.7.0
+          image: tomsquest/docker-radicale:3.1.8.0
           ports:
             - name: http
               protocol: TCP

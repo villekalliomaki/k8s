@@ -26,7 +26,7 @@ spec:
       containers:
         - name: pihole
           # https://hub.docker.com/r/pihole/pihole/tags
-          image: pihole/pihole:2022.05
+          image: pihole/pihole:2022.07.1
           ports:
             - name: dns-tcp
               containerPort: 53
