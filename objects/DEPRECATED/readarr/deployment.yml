@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: readarr
+  labels:
+    app: readarr
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: readarr
+  template:
+    metadata:
+      labels:
+        app: readarr
+    spec:
+      containers:
+        - name: readarr
+          # https://hub.docker.com/r/hotio/readarr/tags
+          image: hotio/readarr:pr-449b7fa
+          ports:
+            # Web
+            - containerPort: 8787
+              name: web
+          env:
+            - name: TZ
+              value: Europe/Helsinki
+          volumeMounts:
+            # Config
+            - name: readarr
+              mountPath: /config
+            # Movies
+            - name: media
+              mountPath: /books
+              subPath: books
+            # Download client downloads
+            - name: media
+              mountPath: /downloads
+              subPath: downloads
+      volumes:
+        # Config
+        - name: readarr
+          persistentVolumeClaim:
+            claimName: readarr
+        # Media
+        - name: media
+          persistentVolumeClaim:
+            claimName: local-media
+      # Run on cypress where the disk is
+      nodeSelector:
+        kubernetes.io/hostname: cypress

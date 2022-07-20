@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: filebrowser
+  labels:
+    app: filebrowser
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: filebrowser
+  template:
+    metadata:
+      labels:
+        app: filebrowser
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: cypress
+      containers:
+        - name: filebrowser
+          # https://hub.docker.com/r/filebrowser/filebrowser/tags
+          image: filebrowser/filebrowser:v2.22.3-s6
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - name: filebrowser
+              mountPath: /database
+            - name: media
+              mountPath: /srv
+            - name: config
+              mountPath: /config
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: local-media
+        - name: filebrowser
+          persistentVolumeClaim:
+            claimName: filebrowser
+        - name: config
+          configMap:
+            name: filebrowser-config
