@@ -158,6 +158,11 @@ spec:
                   - "^/jackett([/?].*)?$"
                   - "^/transmission([/?].*)?$"
                   - "^/bazarr([/?].*)?$"
+              - domain: 'files.{{ .Data.data.domain }}'
+                policy: two_factor
+                subject:
+                  - ["group:admin"]
+                  - ["group:media"]
 
               # Admin only
               - domain:
